@@ -1,6 +1,6 @@
 digraph logic_model {
-	graph [rankdir=LR ratio=auto]
-	node [fontname="Helvetica,Arial,sans-serif"]
+	graph [layout=dot rankdir=LR ratio=auto]
+	node [fontname=Helvetica]
 	subgraph cluster_0 {
 		node [shape=plaintext style=filled]
 		color=blue
@@ -10,8 +10,8 @@ digraph logic_model {
 		node [shape=plaintext style=filled]
 		color=blue
 		label=migration
-		"Журнал миграции" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0"><TR><TD bgcolor="green" PORT="0">Журнал миграции</TD></TR><TR><TD  PORT="1">Строка подключения к БД</TD></TR><TR><TD  PORT="2">Предыдущая версия БД</TD></TR><TR><TD  PORT="3">Целевая версия БД</TD></TR><TR><TD  PORT="4">Название сценария миграции</TD></TR><TR><TD  PORT="5">Журнал выполнения</TD></TR><TR><TD  PORT="6">Признак успешного завершения</TD></TR><TR><TD  PORT="7">Сценарий</TD></TR><TR><TD  PORT="8">Скрипт миграции</TD></TR></TABLE>>]
-		"Скрипт миграции" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0"><TR><TD bgcolor="green" PORT="0">Скрипт миграции</TD></TR><TR><TD  PORT="1">Предыдущая версия БД</TD></TR><TR><TD  PORT="2">Целевая версия БД</TD></TR><TR><TD  PORT="3">Сценарий миграции</TD></TR><TR><TD  PORT="4">Название скрипта SQL</TD></TR></TABLE>>]
+		"Журнал миграции" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0"><TR><TD bgcolor="green" PORT="0">Журнал миграции</TD></TR><TR><TD PORT="1">Строка подключения к БД</TD></TR><TR><TD PORT="2">Предыдущая версия БД</TD></TR><TR><TD PORT="3">Целевая версия БД</TD></TR><TR><TD PORT="4">Название сценария миграции</TD></TR><TR><TD PORT="5">Журнал выполнения</TD></TR><TR><TD PORT="6">Признак успешного завершения</TD></TR><TR><TD PORT="7">Сценарий</TD></TR><TR><TD PORT="8">Скрипт миграции</TD></TR></TABLE>>]
+		"Скрипт миграции" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0"><TR><TD bgcolor="green" PORT="0">Скрипт миграции</TD></TR><TR><TD PORT="1">Предыдущая версия БД</TD></TR><TR><TD PORT="2">Целевая версия БД</TD></TR><TR><TD PORT="3">Сценарий миграции</TD></TR><TR><TD PORT="4">Название скрипта SQL</TD></TR></TABLE>>]
 		"Журнал миграции":8 -> "Скрипт миграции":0
 	}
 	subgraph cluster_1 {
@@ -23,8 +23,8 @@ digraph logic_model {
 		node [shape=plaintext style=filled]
 		color=blue
 		label=dimensions
-		"Классификация" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0"><TR><TD bgcolor="green" PORT="0">Классификация</TD></TR><TR><TD  PORT="1">Код</TD></TR><TR><TD  PORT="2">Название</TD></TR><TR><TD  PORT="3">Описание</TD></TR><TR><TD  PORT="4">Ранг</TD></TR><TR><TD  PORT="5">Справочник</TD></TR><TR><TD  PORT="6">Родительский объект</TD></TR></TABLE>>]
-		"Справочник" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0"><TR><TD bgcolor="green" PORT="0">Справочник</TD></TR><TR><TD  PORT="1">Код</TD></TR><TR><TD  PORT="2">Название</TD></TR><TR><TD  PORT="3">Описание</TD></TR></TABLE>>]
+		"Классификация" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0"><TR><TD bgcolor="green" PORT="0">Классификация</TD></TR><TR><TD PORT="1">Код</TD></TR><TR><TD PORT="2">Название</TD></TR><TR><TD PORT="3">Описание</TD></TR><TR><TD PORT="4">Ранг</TD></TR><TR><TD PORT="5">Справочник</TD></TR><TR><TD PORT="6">Родительский объект</TD></TR></TABLE>>]
+		"Справочник" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0"><TR><TD bgcolor="green" PORT="0">Справочник</TD></TR><TR><TD PORT="1">Код</TD></TR><TR><TD PORT="2">Название</TD></TR><TR><TD PORT="3">Описание</TD></TR></TABLE>>]
 		"Классификация":5 -> "Справочник":0
 		"Классификация":6 -> "Классификация":0
 	}
@@ -37,9 +37,9 @@ digraph logic_model {
 		node [shape=plaintext style=filled]
 		color=blue
 		label=admin_panel
-		"Учетная запись" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0"><TR><TD bgcolor="green" PORT="0">Учетная запись</TD></TR><TR><TD  PORT="1">Название учетной записи пользователя</TD></TR><TR><TD  PORT="2">Фамилия</TD></TR><TR><TD  PORT="3">Имя</TD></TR><TR><TD  PORT="4">Отчество</TD></TR><TR><TD  PORT="5">Адрес электронной почты</TD></TR><TR><TD  PORT="6">Дата рождения</TD></TR><TR><TD  PORT="7">Телефон</TD></TR><TR><TD  PORT="8">Хеш пароля</TD></TR><TR><TD  PORT="9">Срок действия</TD></TR><TR><TD  PORT="10">Число попыток неудачного входа</TD></TR><TR><TD  PORT="11">Момент блокировки учетной записи</TD></TR><TR><TD  PORT="12">Алгоритм хэша</TD></TR><TR><TD  PORT="13">Статус учетной записи</TD></TR><TR><TD  PORT="14">Структурное подразделение</TD></TR><TR><TD  PORT="15">Должность</TD></TR></TABLE>>]
-		"Роль пользователя" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0"><TR><TD bgcolor="green" PORT="0">Роль пользователя</TD></TR><TR><TD  PORT="1">Роль</TD></TR><TR><TD  PORT="2">Пользователь</TD></TR></TABLE>>]
-		"Статус учетной записи" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0"><TR><TD bgcolor="green" PORT="0">Статус учетной записи</TD></TR><TR><TD  PORT="1">Пользователь</TD></TR></TABLE>>]
+		"Учетная запись" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0"><TR><TD bgcolor="green" PORT="0">Учетная запись</TD></TR><TR><TD PORT="1">Название учетной записи пользователя</TD></TR><TR><TD PORT="2">Фамилия</TD></TR><TR><TD PORT="3">Имя</TD></TR><TR><TD PORT="4">Отчество</TD></TR><TR><TD PORT="5">Адрес электронной почты</TD></TR><TR><TD PORT="6">Дата рождения</TD></TR><TR><TD PORT="7">Телефон</TD></TR><TR><TD PORT="8">Хеш пароля</TD></TR><TR><TD PORT="9">Срок действия</TD></TR><TR><TD PORT="10">Число попыток неудачного входа</TD></TR><TR><TD PORT="11">Момент блокировки учетной записи</TD></TR><TR><TD PORT="12">Алгоритм хэша</TD></TR><TR><TD PORT="13">Статус учетной записи</TD></TR><TR><TD PORT="14">Структурное подразделение</TD></TR><TR><TD PORT="15">Должность</TD></TR></TABLE>>]
+		"Роль пользователя" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0"><TR><TD bgcolor="green" PORT="0">Роль пользователя</TD></TR><TR><TD PORT="1">Роль</TD></TR><TR><TD PORT="2">Пользователь</TD></TR></TABLE>>]
+		"Статус учетной записи" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0"><TR><TD bgcolor="green" PORT="0">Статус учетной записи</TD></TR><TR><TD PORT="1">Пользователь</TD></TR></TABLE>>]
 		"Учетная запись":12 -> "Классификация":0
 		"Учетная запись":13 -> "Классификация":0
 		"Учетная запись":14 -> "Классификация":0
@@ -58,7 +58,7 @@ digraph logic_model {
 		node [shape=plaintext style=filled]
 		color=blue
 		label=orchestrator
-		"Интеграционный процесс" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0"><TR><TD bgcolor="green" PORT="0">Интеграционный процесс</TD></TR><TR><TD  PORT="1">Код транзакции</TD></TR><TR><TD  PORT="2">Время начала интеграционного процесса</TD></TR><TR><TD  PORT="3">Время окончания интеграционного процесса</TD></TR><TR><TD  PORT="4">Сообщение о результате интеграции</TD></TR><TR><TD  PORT="5">Система-инициатор</TD></TR><TR><TD  PORT="6">Ведомая система</TD></TR><TR><TD  PORT="7">Результат интеграционного процесса</TD></TR></TABLE>>]
+		"Интеграционный процесс" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0"><TR><TD bgcolor="green" PORT="0">Интеграционный процесс</TD></TR><TR><TD PORT="1">Код транзакции</TD></TR><TR><TD PORT="2">Время начала интеграционного процесса</TD></TR><TR><TD PORT="3">Время окончания интеграционного процесса</TD></TR><TR><TD PORT="4">Сообщение о результате интеграции</TD></TR><TR><TD PORT="5">Система-инициатор</TD></TR><TR><TD PORT="6">Ведомая система</TD></TR><TR><TD PORT="7">Результат интеграционного процесса</TD></TR></TABLE>>]
 		"Интеграционный процесс":5 -> "Классификация":0
 		"Интеграционный процесс":6 -> "Классификация":0
 		"Интеграционный процесс":0 -> "Классификация":0
@@ -73,9 +73,9 @@ digraph logic_model {
 		node [shape=plaintext style=filled]
 		color=blue
 		label=trans_energy
-		te_version [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0"><TR><TD bgcolor="green" PORT="0">te_version</TD></TR><TR><TD  PORT="1">Форма</TD></TR></TABLE>>]
-		te_values [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0"><TR><TD bgcolor="green" PORT="0">te_values</TD></TR><TR><TD  PORT="1">Суррогатный ключ</TD></TR><TR><TD  PORT="2">Год</TD></TR><TR><TD  PORT="3">Значение</TD></TR><TR><TD  PORT="4">version_id</TD></TR><TR><TD  PORT="5">Тип массива данных</TD></TR><TR><TD  PORT="6">Организация</TD></TR><TR><TD  PORT="7">Тип объекта</TD></TR><TR><TD  PORT="8">Тип подвижного состава</TD></TR><TR><TD  PORT="9">Тип мероприятия</TD></TR><TR><TD  PORT="10">Единица измерения мероприятий</TD></TR></TABLE>>]
-		sliders [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0"><TR><TD bgcolor="green" PORT="0">sliders</TD></TR><TR><TD  PORT="1">Суррогатный ключ</TD></TR><TR><TD  PORT="2">Год</TD></TR><TR><TD  PORT="3">Значение</TD></TR><TR><TD  PORT="4">Признак блокировки</TD></TR><TR><TD  PORT="5">version_id</TD></TR><TR><TD  PORT="6">Тип массива данных</TD></TR><TR><TD  PORT="7">Организация</TD></TR><TR><TD  PORT="8">Тип объекта</TD></TR><TR><TD  PORT="9">Тип подвижного состава</TD></TR></TABLE>>]
+		te_version [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0"><TR><TD bgcolor="green" PORT="0">te_version</TD></TR><TR><TD PORT="1">Форма</TD></TR></TABLE>>]
+		te_values [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0"><TR><TD bgcolor="green" PORT="0">te_values</TD></TR><TR><TD PORT="1">Суррогатный ключ</TD></TR><TR><TD PORT="2">Год</TD></TR><TR><TD PORT="3">Значение</TD></TR><TR><TD PORT="4">version_id</TD></TR><TR><TD PORT="5">Тип массива данных</TD></TR><TR><TD PORT="6">Организация</TD></TR><TR><TD PORT="7">Тип объекта</TD></TR><TR><TD PORT="8">Тип подвижного состава</TD></TR><TR><TD PORT="9">Тип мероприятия</TD></TR><TR><TD PORT="10">Единица измерения мероприятий</TD></TR></TABLE>>]
+		sliders [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0"><TR><TD bgcolor="green" PORT="0">sliders</TD></TR><TR><TD PORT="1">Суррогатный ключ</TD></TR><TR><TD PORT="2">Год</TD></TR><TR><TD PORT="3">Значение</TD></TR><TR><TD PORT="4">Признак блокировки</TD></TR><TR><TD PORT="5">version_id</TD></TR><TR><TD PORT="6">Тип массива данных</TD></TR><TR><TD PORT="7">Организация</TD></TR><TR><TD PORT="8">Тип объекта</TD></TR><TR><TD PORT="9">Тип подвижного состава</TD></TR></TABLE>>]
 		te_version:1 -> "Классификация":0
 		te_values:4 -> te_version:0
 		te_values:5 -> "Классификация":0
