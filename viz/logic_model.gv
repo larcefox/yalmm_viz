@@ -1,0 +1,41 @@
+digraph logic_model {
+	graph [rankdir=LR ratio=auto]
+	node [fontname="Helvetica,Arial,sans-serif"]
+	subgraph cluster_0 {
+		node [shape=plaintext style=filled]
+		color=blue
+		label=migration
+		"Журнал миграции" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0"><TR><TD bgcolor="green" PORT="0">Журнал миграции</TD></TR></TABLE>>]
+		"Скрипт миграции" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0"><TR><TD bgcolor="green" PORT="0">Скрипт миграции</TD></TR></TABLE>>]
+	}
+	subgraph cluster_1 {
+		node [shape=plaintext style=filled]
+		color=blue
+		label=dimensions
+		"Классификация" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0"><TR><TD bgcolor="green" PORT="0">Классификация</TD></TR></TABLE>>]
+		"Справочник" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0"><TR><TD bgcolor="green" PORT="0">Справочник</TD></TR></TABLE>>]
+	}
+	subgraph cluster_2 {
+		node [shape=plaintext style=filled]
+		color=blue
+		label=admin_panel
+		"Учетная запись" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0"><TR><TD bgcolor="green" PORT="0">Учетная запись</TD></TR></TABLE>>]
+		"Роль пользователя" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0"><TR><TD bgcolor="green" PORT="0">Роль пользователя</TD></TR></TABLE>>]
+		"Статус учетной записи" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0"><TR><TD bgcolor="green" PORT="0">Статус учетной записи</TD></TR></TABLE>>]
+		"Статус учетной записи":0 -> "Классификация":0
+	}
+	subgraph cluster_3 {
+		node [shape=plaintext style=filled]
+		color=blue
+		label=orchestrator
+		"Интеграционный процесс" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0"><TR><TD bgcolor="green" PORT="0">Интеграционный процесс</TD></TR></TABLE>>]
+	}
+	subgraph cluster_4 {
+		node [shape=plaintext style=filled]
+		color=blue
+		label=trans_energy
+		te_version [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0"><TR><TD bgcolor="green" PORT="0">te_version</TD></TR></TABLE>>]
+		te_values [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0"><TR><TD bgcolor="green" PORT="0">te_values</TD></TR></TABLE>>]
+		repair_delay [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0"><TR><TD bgcolor="green" PORT="0">repair_delay</TD></TR></TABLE>>]
+	}
+}
