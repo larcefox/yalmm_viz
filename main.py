@@ -1,75 +1,78 @@
 from yaml import safe_load
 from pprint import pprint
 import graphviz
-from collections import OrderedDict
 
-
-with open('logic_model/logic_model.yaml') as file:
-    yaml_data = safe_load(file)
-
-dot = graphviz.Digraph(name='logic_model', node_attr={'fontname':'Helvetica,Arial,sans-serif'}, format='png')
-dot.graph_attr['rankdir'] = 'LR'
-dot.graph_attr['ratio'] = 'auto'
-
-entities = {}
-for entity in yaml_data['Aliases']['Entities']:
-    entities[entity] = yaml_data['Aliases']['Entities'][entity]
-
-attributes = {}
-for attribute in yaml_data['Aliases']['Attributes']:
-    entities[attribute] = yaml_data['Aliases']['Attributes'][attribute]
-
-areas = yaml_data['Tables']
 
 table_name_style = 'bgcolor="green"'
 
-def fill_nodes():
+class model_draw:
+    def __init__(self) -> None:
+        self.yaml_data = self.get_data()
+        self.graf = graphviz.Digraph(
+            name='logic_model', 
+            node_attr={'fontname':'Helvetica,Arial,sans-serif'}, 
+            format='png',
+            graph_attr={'rankdir':'LR', 'ratio':'auto'}
+            )
+        self.entities = {}
+        self.attributes = {}
+        self.edge_maper = {}
 
-    tables = {}
-    for area in areas:
-        tables = areas[area]
+    def get_data(self) -> None:
+        with open('logic_model/logic_model.yaml') as file:
+            return safe_load(file)
 
-        with dot.subgraph(name=f'cluster_{list(areas.keys()).index(area)}') as subgraph:
+    def get_entities(self) -> None:
+        for entity in self.yaml_data['Aliases']['Entities']:
+            self.entities[entity] = self.yaml_data['Aliases']['Entities'][entity]
+
+    def get_attributes(self) -> None:
+        for attribute in self.yaml_data['Aliases']['Attributes']:
+            self.entities[attribute] = self.yaml_data['Aliases']['Attributes'][attribute]
+
+    def get_areas(self, yaml_data) -> dict:
+        return yaml_data['Tables']
+
+    def make_subgraph(self, areas, area) -> graphviz.Graph:
+        with self.graf.subgraph(name=f'cluster_{list(areas.keys()).index(area)}') as subgraph:
             subgraph.attr(color='blue')
             subgraph.attr(label=area)
             subgraph.node_attr['style'] = 'filled'
             subgraph.node_attr['shape'] = 'plaintext'
+            return subgraph
+    
+    def parse_columns(self, table_log_name, table_data) -> dict:
 
-            for table_log_name in tables:
+        columns = {table_log_name: table_log_name}
 
-                columns = OrderedDict()
-                columns = {table_log_name: table_log_name}
+        try:
+            if table_data['columns']:
+                columns |= table_data['columns']
+            else:
+                raise KeyError
+        except KeyError:
+            pass
 
-                try:
-                    if tables[table_log_name]['columns']:
-                        columns |= tables[table_log_name]['columns']
-                    else:
-                        raise KeyError
-                except KeyError:
-                    columns |= {table_log_name: table_log_name}
+        try:
+            refs = table_data['refs']
+            columns.update(refs)
+        except KeyError:
+            pass
 
-                try:
-                    refs = tables[table_log_name]['refs']
-                    columns.update(refs)
-                except KeyError:
-                    pass
+        return columns
+    
+    def make_edge_maper(self, table, columns) -> dict:
+        self.edge_maper |= {table: {}}
+        for column in columns:
+            self.edge_maper[table] |= {column: list(columns.keys()).index(column)}
+        return self.edge_maper
 
-                
-                labels, edge_maper = fill_labels(columns, table_log_name)
-
-                subgraph.node(table_log_name, f'<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">{"".join(labels)}</TABLE>>')
-
-            fill_edges(edge_maper, tables, subgraph)
-
-
-def fill_labels(columns, table_log_name):
-    edge_maper = {table_log_name: {}}
-    labels = []
-    for column in columns:
-        edge_maper[table_log_name] |= {column: list(columns.keys()).index(column)}
-        labels.append(
-            f'<TR><TD {table_name_style if list(columns.keys()).index(column) == 0 else ""} PORT="{list(columns.keys()).index(column)}">{column}</TD></TR>'
-            )
+    def fill_labels(self, columns) -> str:
+        labels = []
+        for column in columns:
+            labels.append(
+                f'<TR><TD {table_name_style if list(columns.keys()).index(column) == 0 else ""} PORT="{list(columns.keys()).index(column)}">{column}</TD></TR>'
+                )
         """array1 [label=< 
             <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0"> <TR>
                 <TD PORT="a1">A(1)</TD>
@@ -78,38 +81,51 @@ def fill_labels(columns, table_log_name):
                 <TD PORT="an">A(n)</TD>
             </TR> </TABLE>>];
         """
-        return labels, edge_maper
+        return labels
+
+    def fill_nodes(self, table_log_name, labels, subgraph) -> None:
+            subgraph.node(table_log_name, f'<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">{"".join(labels)}</TABLE>>')
+
+    def fill_edges(self, tables, subgraph, edge_maper) -> None:
+        for table in tables:
+            try:
+                refs = tables[table]['refs']
+
+                for ref in refs:
+                    current_table = table 
+                    current_fild_num = edge_maper[table][ref]
+                    foreign_table = refs[ref].split(".")[0]
+
+                    if 'Суррогатный ключ' in refs[ref].split(".")[1]: 
+                        foreign_fild_num = 0 
+                    else:
+                        foreign_fild_num = refs[ref].split(".")[1]
+                    
+                    subgraph.edge(f'{current_table}:{current_fild_num}', f'{foreign_table}:{foreign_fild_num}')
+
+            except KeyError:
+                pass
     
+    def render_graph(self) -> None:
+        self.graf.render(directory='./viz')
+        #pprint(self.graf.source)       
 
-def fill_edges(edge_maper, tables, subgraph):
-    for table_log_name in tables:
-        try:
-            refs = tables[table_log_name]['refs']
+    def draw(self) -> None:
+        yaml_data = self.yaml_data
+        areas = self.get_areas(yaml_data)
+        for area in areas:
+            subgraph = self.make_subgraph(areas, area)
+            tables = areas[area]
 
-            for ref in refs:
-                current_table = table_log_name
-                current_fild_num = edge_maper[table_log_name][ref]
-                foreign_table = refs[ref].split(".")[0]
-
-                if 'Суррогатный ключ' in refs[ref].split(".")[1]: 
-                    foreign_fild_num = 0 
-                else:
-                    foreign_fild_num = refs[ref].split(".")[1]
-                
-                subgraph.edge(f'{current_table}:{current_fild_num}', f'{foreign_table}:{foreign_fild_num}')
-
-        except KeyError:
-            pass
-
-
-
-def render_graph():
-    dot.render(directory='./viz')
-    #pprint(dot.source)
-
-def main():
-    fill_nodes()
-    render_graph()
+            for table in tables:
+                columns = self.parse_columns(table, tables[table])
+                edge_maper = self.make_edge_maper(table, columns)
+                labels = self.fill_labels(columns)
+                self.fill_nodes(table, labels, subgraph)
+            self.fill_edges(tables, subgraph, edge_maper)
+            self.graf.subgraph(subgraph)
+        self.render_graph()
 
 if __name__ == "__main__":
-    main()
+    draw = model_draw()
+    draw.draw()
