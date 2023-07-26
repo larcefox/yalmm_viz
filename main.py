@@ -11,26 +11,28 @@ class model_draw:
         self.graf_layout = 'dot'
         self.main_graph_name = 'logic_model'
         self.graf = self.make_main_graph()
-        self.entities = {}
-        self.attributes = {}
+        self.entities = self.get_entities()
+        self.attributes = self.get_attributes()
         self.edge_maper = {}
         self.table_name_fild_style = 'bgcolor="green"'
-        self.classification_table = 'Классификация'
-        self.use_classification_table = False
         self.classification_ref_fild_style = 'bgcolor="lightblue"'
+        self.classification_table = 'Классификация'
         self.simpl_edge_mode = False
+        self.use_classification_table = False
 
     def get_data(self) -> None:
         with open(f'{self.logic_file_dir_name}/{self.logic_file_name}') as file:
             return safe_load(file)
 
     def get_entities(self) -> None:
+        self.entities = {}
         for entity in self.yaml_data['Aliases']['Entities']:
             self.entities[entity] = self.yaml_data['Aliases']['Entities'][entity]
 
     def get_attributes(self) -> None:
+        self.attributes = {}
         for attribute in self.yaml_data['Aliases']['Attributes']:
-            self.entities[attribute] = self.yaml_data['Aliases']['Attributes'][attribute]
+            self.attributes[attribute] = self.yaml_data['Aliases']['Attributes'][attribute]
 
     def get_areas(self, yaml_data) -> dict:
         return yaml_data['Tables']
@@ -79,23 +81,24 @@ class model_draw:
 
     def fill_labels(self, columns,refs, table_log_name) -> list:
         labels = []
+
         for column in columns:
+
             if self.use_classification_table and list(columns.keys()).index(column) == 0 and table_log_name == self.classification_table:
-                labels.append(
-                    f'<TR><TD {self.classification_ref_fild_style} PORT="{list(columns.keys()).index(column)}">{column}</TD></TR>'
-                    )
+                style = self.classification_ref_fild_style
+                labels.append(f'<TR><TD {style} PORT="{list(columns.keys()).index(column)}">{column}</TD></TR>')
+
             elif list(columns.keys()).index(column) == 0:
-                labels.append(
-                    f'<TR><TD {self.table_name_fild_style} PORT="{list(columns.keys()).index(column)}">{column}</TD></TR>'
-                    )
+                style = self.table_name_fild_style
+                labels.append(f'<TR><TD {style} PORT="{list(columns.keys()).index(column)}">{column}</TD></TR>')
+
             elif self.use_classification_table and refs and column in refs and self.classification_table in refs[column]:
-                labels.append(
-                    f'<TR><TD {self.classification_ref_fild_style} PORT="{list(columns.keys()).index(column)}">{column}</TD></TR>'
-                    )
+                style = self.classification_ref_fild_style
+                labels.append(f'<TR><TD {style} PORT="{list(columns.keys()).index(column)}">{column}</TD></TR>')
+
             else:
-                labels.append(
-                    f'<TR><TD PORT="{list(columns.keys()).index(column)}">{column}</TD></TR>'
-                    )
+                labels.append(f'<TR><TD PORT="{list(columns.keys()).index(column)}">{column}</TD></TR>')
+
         """array1 [label=< 
             <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0"> <TR>
                 <TD PORT="a1">A(1)</TD>
@@ -109,7 +112,7 @@ class model_draw:
     def fill_nodes(self, table_log_name, labels, subgraph) -> None:
             subgraph.node(table_log_name, f'<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">{"".join(labels)}</TABLE>>')
 
-    def get_refs(self, table_data):
+    def get_refs(self, table_data) -> dict | None:
             try:
                 return table_data['refs']
             except KeyError:
@@ -127,7 +130,6 @@ class model_draw:
                     subgraph.edge(f'{table}', f'{connection}')
             except KeyError:
                 pass
-
 
     def fill_edges(self, tables, subgraph, edge_maper) -> None:
         for table in tables:
