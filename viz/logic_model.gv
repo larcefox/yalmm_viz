@@ -1,5 +1,5 @@
 digraph logic_model {
-	graph [layout=dot rankdir=LR ratio=auto]
+	graph [layout=sfdp rankdir=LR ratio=auto]
 	node [fontname=Helvetica]
 	subgraph cluster_0 {
 		node [shape=plaintext style=filled]
@@ -10,8 +10,8 @@ digraph logic_model {
 		node [shape=plaintext style=filled]
 		color=blue
 		label=migration
-		"Журнал миграции" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0"><TR><TD bgcolor="green" PORT="0">Журнал миграции</TD></TR><TR><TD PORT="1">Строка подключения к БД</TD></TR><TR><TD PORT="2">Предыдущая версия БД</TD></TR><TR><TD PORT="3">Целевая версия БД</TD></TR><TR><TD PORT="4">Название сценария миграции</TD></TR><TR><TD PORT="5">Журнал выполнения</TD></TR><TR><TD PORT="6">Признак успешного завершения</TD></TR><TR><TD PORT="7">Сценарий</TD></TR><TR><TD PORT="8">Скрипт миграции</TD></TR></TABLE>>]
-		"Скрипт миграции" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0"><TR><TD bgcolor="green" PORT="0">Скрипт миграции</TD></TR><TR><TD PORT="1">Предыдущая версия БД</TD></TR><TR><TD PORT="2">Целевая версия БД</TD></TR><TR><TD PORT="3">Сценарий миграции</TD></TR><TR><TD PORT="4">Название скрипта SQL</TD></TR></TABLE>>]
+		"Журнал миграции" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0"><TR><TD bgcolor="green" PORT="0">Журнал миграции</TD></TR><TR><TD align="left" PORT="1">Строка подключения к БД</TD></TR><TR><TD align="left" PORT="2">Предыдущая версия БД</TD></TR><TR><TD align="left" PORT="3">Целевая версия БД</TD></TR><TR><TD align="left" PORT="4">Название сценария миграции</TD></TR><TR><TD align="left" PORT="5">Журнал выполнения</TD></TR><TR><TD align="left" PORT="6">Признак успешного завершения</TD></TR><TR><TD align="left" PORT="7">Сценарий</TD></TR><TR><TD align="left" PORT="8">Скрипт миграции</TD></TR></TABLE>>]
+		"Скрипт миграции" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0"><TR><TD bgcolor="green" PORT="0">Скрипт миграции</TD></TR><TR><TD align="left" PORT="1">Предыдущая версия БД</TD></TR><TR><TD align="left" PORT="2">Целевая версия БД</TD></TR><TR><TD align="left" PORT="3">Сценарий миграции</TD></TR><TR><TD align="left" PORT="4">Название скрипта SQL</TD></TR></TABLE>>]
 		"Журнал миграции":8 -> "Скрипт миграции":0
 	}
 	subgraph cluster_1 {
@@ -23,71 +23,131 @@ digraph logic_model {
 		node [shape=plaintext style=filled]
 		color=blue
 		label=dimensions
-		"Классификация" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0"><TR><TD bgcolor="green" PORT="0">Классификация</TD></TR><TR><TD PORT="1">Код</TD></TR><TR><TD PORT="2">Название</TD></TR><TR><TD PORT="3">Описание</TD></TR><TR><TD PORT="4">Ранг</TD></TR><TR><TD PORT="5">Справочник</TD></TR><TR><TD PORT="6">Родительский объект</TD></TR></TABLE>>]
-		"Справочник" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0"><TR><TD bgcolor="green" PORT="0">Справочник</TD></TR><TR><TD PORT="1">Код</TD></TR><TR><TD PORT="2">Название</TD></TR><TR><TD PORT="3">Описание</TD></TR></TABLE>>]
+		"Классификация" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0"><TR><TD bgcolor="green" PORT="0">Классификация</TD></TR><TR><TD align="left" PORT="1">Код</TD></TR><TR><TD align="left" PORT="2">Название</TD></TR><TR><TD align="left" PORT="3">Описание</TD></TR><TR><TD align="left" PORT="4">Ранг</TD></TR><TR><TD align="left" PORT="5">Справочник</TD></TR><TR><TD align="left" PORT="6">Родительский объект</TD></TR><TR><TD align="left" PORT="7">Тип объекта</TD></TR></TABLE>>]
+		"Справочник" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0"><TR><TD bgcolor="green" PORT="0">Справочник</TD></TR><TR><TD align="left" PORT="1">Код</TD></TR><TR><TD align="left" PORT="2">Название</TD></TR><TR><TD align="left" PORT="3">Описание</TD></TR></TABLE>>]
+		"Пользователь Прогруз" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0"><TR><TD bgcolor="green" PORT="0">Пользователь Прогруз</TD></TR><TR><TD align="left" PORT="1">Название учетной записи пользователя</TD></TR></TABLE>>]
 		"Классификация":5 -> "Справочник":0
 		"Классификация":6 -> "Классификация":0
+		"Классификация":7 -> "Справочник":0
 	}
 	subgraph cluster_2 {
 		node [shape=plaintext style=filled]
 		color=blue
-		label=admin_panel
+		label=cargo_data
 	}
 	subgraph cluster_2 {
 		node [shape=plaintext style=filled]
 		color=blue
-		label=admin_panel
-		"Учетная запись" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0"><TR><TD bgcolor="green" PORT="0">Учетная запись</TD></TR><TR><TD PORT="1">Название учетной записи пользователя</TD></TR><TR><TD PORT="2">Фамилия</TD></TR><TR><TD PORT="3">Имя</TD></TR><TR><TD PORT="4">Отчество</TD></TR><TR><TD PORT="5">Адрес электронной почты</TD></TR><TR><TD PORT="6">Дата рождения</TD></TR><TR><TD PORT="7">Телефон</TD></TR><TR><TD PORT="8">Хеш пароля</TD></TR><TR><TD PORT="9">Срок действия</TD></TR><TR><TD PORT="10">Число попыток неудачного входа</TD></TR><TR><TD PORT="11">Момент блокировки учетной записи</TD></TR><TR><TD PORT="12">Алгоритм хэша</TD></TR><TR><TD PORT="13">Статус учетной записи</TD></TR><TR><TD PORT="14">Структурное подразделение</TD></TR><TR><TD PORT="15">Должность</TD></TR></TABLE>>]
-		"Роль пользователя" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0"><TR><TD bgcolor="green" PORT="0">Роль пользователя</TD></TR><TR><TD PORT="1">Роль</TD></TR><TR><TD PORT="2">Пользователь</TD></TR></TABLE>>]
-		"Статус учетной записи" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0"><TR><TD bgcolor="green" PORT="0">Статус учетной записи</TD></TR><TR><TD PORT="1">Пользователь</TD></TR></TABLE>>]
-		"Учетная запись":12 -> "Классификация":0
-		"Учетная запись":13 -> "Классификация":0
-		"Учетная запись":14 -> "Классификация":0
-		"Учетная запись":15 -> "Классификация":0
-		"Роль пользователя":1 -> "Классификация":0
-		"Роль пользователя":2 -> "Учетная запись":0
-		"Статус учетной записи":0 -> "Классификация":0
-		"Статус учетной записи":1 -> "Учетная запись":0
+		label=cargo_data
+		"Сценарий погрузки" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0"><TR><TD bgcolor="green" PORT="0">Сценарий погрузки</TD></TR><TR><TD align="left" PORT="1">Родительский сценарий АС Прогруз</TD></TR><TR><TD align="left" PORT="2">Название</TD></TR><TR><TD align="left" PORT="3">Описание</TD></TR><TR><TD align="left" PORT="4">Признак наличия данных по объемам остальных грузоперевозок</TD></TR><TR><TD align="left" PORT="5">Признак наличия данных по объемам остальных грузоперевозок в разрезе субъектов РФ</TD></TR><TR><TD align="left" PORT="6">Признак наличия данных по основным корреспонденциям</TD></TR><TR><TD align="left" PORT="7">Признак наличия данных по средним объемам и средней дальности остальных грузоперевозок</TD></TR><TR><TD align="left" PORT="8">Признак пропуска корректировки ЕИМ</TD></TR><TR><TD align="left" PORT="9">Признак отображения в ЕИМ</TD></TR><TR><TD align="left" PORT="10">Год начала горизонта</TD></TR><TR><TD align="left" PORT="11">Год окончания горизонта</TD></TR><TR><TD align="left" PORT="12">Родительский сценарий Прогруз</TD></TR><TR><TD align="left" PORT="13">Тип сценария погрузки</TD></TR></TABLE>>]
+		"Направление погрузки" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0"><TR><TD bgcolor="green" PORT="0">Направление погрузки</TD></TR><TR><TD align="left" PORT="1">Код</TD></TR><TR><TD align="left" PORT="2">Признак контейнеризации</TD></TR><TR><TD align="left" PORT="3">Сценарий погрузки</TD></TR><TR><TD align="left" PORT="4">Тип массива данных</TD></TR><TR><TD align="left" PORT="5">Группа груза</TD></TR><TR><TD align="left" PORT="6">Вид перевозки</TD></TR><TR><TD align="left" PORT="7">Укрупненная группа груза</TD></TR><TR><TD align="left" PORT="8">Железная дорога отправления</TD></TR><TR><TD align="left" PORT="9">Железная дорога назначения</TD></TR><TR><TD align="left" PORT="10">Регион начала участка</TD></TR><TR><TD align="left" PORT="11">Регион окончания участка</TD></TR><TR><TD align="left" PORT="12">Станция начала участка</TD></TR><TR><TD align="left" PORT="13">Станция окончания участка</TD></TR></TABLE>>]
+		"График погрузки по направлению" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0"><TR><TD bgcolor="green" PORT="0">График погрузки по направлению</TD></TR><TR><TD align="left" PORT="1">Год</TD></TR><TR><TD align="left" PORT="2">Дальность</TD></TR><TR><TD align="left" PORT="3">Объем погрузки</TD></TR><TR><TD align="left" PORT="4">Направление погрузки</TD></TR></TABLE>>]
+		"Направление загрузки сети" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0"><TR><TD bgcolor="green" PORT="0">Направление загрузки сети</TD></TR><TR><TD align="left" PORT="1">Протяженность участка</TD></TR><TR><TD align="left" PORT="2">Тип массива данных</TD></TR><TR><TD align="left" PORT="3">Сценарий погрузки</TD></TR><TR><TD align="left" PORT="4">Железная дорога</TD></TR><TR><TD align="left" PORT="5">Станция начала участка</TD></TR><TR><TD align="left" PORT="6">Станция окончания участка</TD></TR></TABLE>>]
+		"График загрузки направления" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0"><TR><TD bgcolor="green" PORT="0">График загрузки направления</TD></TR><TR><TD align="left" PORT="1">Год</TD></TR><TR><TD align="left" PORT="2">Нагрузка от начальной к конечной станции</TD></TR><TR><TD align="left" PORT="3">Нагрузка от конечной к начальной станции</TD></TR><TR><TD align="left" PORT="4">Суммарная загрузка участка</TD></TR><TR><TD align="left" PORT="5">Направление загрузки сети</TD></TR></TABLE>>]
+		"Нагрузка участка видом груза" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0"><TR><TD bgcolor="green" PORT="0">Нагрузка участка видом груза</TD></TR><TR><TD align="left" PORT="1">Нагрузка от начальной к конечной станции</TD></TR><TR><TD align="left" PORT="2">Нагрузка от конечной к начальной станции</TD></TR><TR><TD align="left" PORT="3">График загрузки направления</TD></TR><TR><TD align="left" PORT="4">Группа груза</TD></TR><TR><TD align="left" PORT="5">Укрупненная группа груза</TD></TR></TABLE>>]
+		"Средние сводные показатели" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0"><TR><TD bgcolor="green" PORT="0">Средние сводные показатели</TD></TR><TR><TD align="left" PORT="1">Год</TD></TR><TR><TD align="left" PORT="2">Объем погрузки</TD></TR><TR><TD align="left" PORT="3">Средняя дистанция</TD></TR><TR><TD align="left" PORT="4">Тип массива данных</TD></TR><TR><TD align="left" PORT="5">Сценарий погрузки</TD></TR><TR><TD align="left" PORT="6">Группа груза</TD></TR><TR><TD align="left" PORT="7">Укрупненная группа груза</TD></TR><TR><TD align="left" PORT="8">Вид перевозки</TD></TR></TABLE>>]
+		"Направление прочих перевозок" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0"><TR><TD bgcolor="green" PORT="0">Направление прочих перевозок</TD></TR><TR><TD align="left" PORT="1">Тип массива данных</TD></TR><TR><TD align="left" PORT="2">Сценарий погрузки</TD></TR><TR><TD align="left" PORT="3">График загрузки направления</TD></TR><TR><TD align="left" PORT="4">Группа груза</TD></TR><TR><TD align="left" PORT="5">Укрупненная группа груза</TD></TR><TR><TD align="left" PORT="6">Вид перевозки</TD></TR><TR><TD align="left" PORT="7">Железная дорога отправления</TD></TR><TR><TD align="left" PORT="8">Железная дорога назначения</TD></TR><TR><TD align="left" PORT="9">Регион начала участка</TD></TR><TR><TD align="left" PORT="10">Регион окончания участка</TD></TR></TABLE>>]
+		"График прочих перевозок" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0"><TR><TD bgcolor="green" PORT="0">График прочих перевозок</TD></TR><TR><TD align="left" PORT="1">Год</TD></TR><TR><TD align="left" PORT="2">Объем погрузки</TD></TR><TR><TD align="left" PORT="3">Дальность</TD></TR><TR><TD align="left" PORT="4">Направление прочих перевозок</TD></TR></TABLE>>]
+		"Договор на ПИР (Техусловия)" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0"><TR><TD bgcolor="green" PORT="0">Договор на ПИР (Техусловия)</TD></TR><TR><TD align="left" PORT="1">Номер договора</TD></TR><TR><TD align="left" PORT="2">Дата договора</TD></TR><TR><TD align="left" PORT="3">Срок действия договора на ПИР</TD></TR></TABLE>>]
+		"Договор примыкания" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0"><TR><TD bgcolor="green" PORT="0">Договор примыкания</TD></TR><TR><TD align="left" PORT="1">Номер договора примыкания</TD></TR><TR><TD align="left" PORT="2">Дата договора примыкания</TD></TR><TR><TD align="left" PORT="3">Срок действия договора примыкания</TD></TR></TABLE>>]
+		"Договор с инвест условиями" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0"><TR><TD bgcolor="green" PORT="0">Договор с инвест условиями</TD></TR><TR><TD align="left" PORT="1">Номер договора с инвест условиями</TD></TR><TR><TD align="left" PORT="2">Дата договора с инвест условиями</TD></TR></TABLE>>]
+		"Заявка на ТУ" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0"><TR><TD bgcolor="green" PORT="0">Заявка на ТУ</TD></TR><TR><TD align="left" PORT="1">Код заявки на ТУ</TD></TR><TR><TD align="left" PORT="2">Дата выдачи и номер ТУ</TD></TR><TR><TD align="left" PORT="3">Признак контейнеризации</TD></TR><TR><TD align="left" PORT="4">Признак объема</TD></TR><TR><TD align="left" PORT="5">Существующий грузооборот</TD></TR><TR><TD align="left" PORT="6">Планируемый грузооборот</TD></TR><TR><TD align="left" PORT="7">Дополнительный грузооборот</TD></TR><TR><TD align="left" PORT="8">Признак корреспонденции</TD></TR><TR><TD align="left" PORT="9">Тарифное расстояние по РФ</TD></TR><TR><TD align="left" PORT="10">Сценарий погрузки</TD></TR><TR><TD align="left" PORT="11">Группа груза</TD></TR><TR><TD align="left" PORT="12">Укрупненная группа груза</TD></TR><TR><TD align="left" PORT="13">Вид перевозки</TD></TR><TR><TD align="left" PORT="14">Железная дорога примыкания</TD></TR><TR><TD align="left" PORT="15">Полигон примыкания</TD></TR><TR><TD align="left" PORT="16">Регион примыкания</TD></TR><TR><TD align="left" PORT="17">Станция примыкания</TD></TR><TR><TD align="left" PORT="18">Договор на ПИР (Техусловия)</TD></TR><TR><TD align="left" PORT="19">Железная дорога отправления</TD></TR><TR><TD align="left" PORT="20">Полигон отправления</TD></TR><TR><TD align="left" PORT="21">Регион начала участка</TD></TR><TR><TD align="left" PORT="22">Станция начала участка</TD></TR><TR><TD align="left" PORT="23">Железная дорога назначения</TD></TR><TR><TD align="left" PORT="24">Полигон назначения</TD></TR><TR><TD align="left" PORT="25">Регион окончания участка</TD></TR><TR><TD align="left" PORT="26">Станция окончания участка</TD></TR><TR><TD align="left" PORT="27">Договор с инвест условиями</TD></TR><TR><TD align="left" PORT="28">Договор примыкания</TD></TR><TR><TD align="left" PORT="29">Наименование заявителя</TD></TR><TR><TD align="left" PORT="30">Грузоотправитель</TD></TR><TR><TD align="left" PORT="31">Грузополучатель</TD></TR><TR><TD align="left" PORT="32">Статус заявки</TD></TR><TR><TD align="left" PORT="33">Тип станции назначения</TD></TR><TR><TD align="left" PORT="34">Тип станции отправления</TD></TR><TR><TD align="left" PORT="35">Тип станции примыкания</TD></TR></TABLE>>]
+		"Соответствие заявок на ТУ и Направлений погрузки" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0"><TR><TD bgcolor="green" PORT="0">Соответствие заявок на ТУ и Направлений погрузки</TD></TR><TR><TD align="left" PORT="1">Признак вхождения</TD></TR><TR><TD align="left" PORT="2">Заявка на ТУ</TD></TR><TR><TD align="left" PORT="3">Направление погрузки</TD></TR></TABLE>>]
+		"Сценарий погрузки":12 -> "Сценарий погрузки":0
+		"Сценарий погрузки":13 -> "Классификация":0
+		"Направление погрузки":3 -> "Сценарий погрузки":0
+		"Направление погрузки":4 -> "Классификация":0
+		"Направление погрузки":5 -> "Классификация":0
+		"Направление погрузки":6 -> "Классификация":0
+		"Направление погрузки":7 -> "Классификация":0
+		"Направление погрузки":8 -> "Классификация":0
+		"Направление погрузки":9 -> "Классификация":0
+		"Направление погрузки":10 -> "Классификация":0
+		"Направление погрузки":11 -> "Классификация":0
+		"Направление погрузки":12 -> "Классификация":0
+		"Направление погрузки":13 -> "Классификация":0
+		"График погрузки по направлению":4 -> "Направление погрузки":0
+		"Направление загрузки сети":2 -> "Классификация":0
+		"Направление загрузки сети":3 -> "Сценарий погрузки":0
+		"Направление загрузки сети":4 -> "Классификация":0
+		"Направление загрузки сети":5 -> "Классификация":0
+		"Направление загрузки сети":6 -> "Классификация":0
+		"График загрузки направления":5 -> "Направление загрузки сети":0
+		"Нагрузка участка видом груза":3 -> "График загрузки направления":0
+		"Нагрузка участка видом груза":4 -> "Классификация":0
+		"Нагрузка участка видом груза":5 -> "Классификация":0
+		"Средние сводные показатели":4 -> "Классификация":0
+		"Средние сводные показатели":5 -> "Сценарий погрузки":0
+		"Средние сводные показатели":6 -> "Классификация":0
+		"Средние сводные показатели":7 -> "Классификация":0
+		"Средние сводные показатели":8 -> "Классификация":0
+		"Направление прочих перевозок":1 -> "Классификация":0
+		"Направление прочих перевозок":2 -> "Сценарий погрузки":0
+		"Направление прочих перевозок":3 -> "График загрузки направления":0
+		"Направление прочих перевозок":4 -> "Классификация":0
+		"Направление прочих перевозок":5 -> "Классификация":0
+		"Направление прочих перевозок":6 -> "Классификация":0
+		"Направление прочих перевозок":7 -> "Классификация":0
+		"Направление прочих перевозок":8 -> "Классификация":0
+		"Направление прочих перевозок":9 -> "Классификация":0
+		"Направление прочих перевозок":10 -> "Классификация":0
+		"График прочих перевозок":4 -> "Направление прочих перевозок":0
+		"Договор на ПИР (Техусловия)":0 -> "Классификация":0
+		"Договор примыкания":0 -> "Классификация":0
+		"Договор с инвест условиями":0 -> "Классификация":0
+		"Заявка на ТУ":10 -> "Сценарий погрузки":0
+		"Заявка на ТУ":11 -> "Классификация":0
+		"Заявка на ТУ":12 -> "Классификация":0
+		"Заявка на ТУ":13 -> "Классификация":0
+		"Заявка на ТУ":14 -> "Классификация":0
+		"Заявка на ТУ":15 -> "Классификация":0
+		"Заявка на ТУ":16 -> "Классификация":0
+		"Заявка на ТУ":17 -> "Классификация":0
+		"Заявка на ТУ":18 -> "Договор на ПИР (Техусловия)":0
+		"Заявка на ТУ":19 -> "Классификация":0
+		"Заявка на ТУ":20 -> "Классификация":0
+		"Заявка на ТУ":21 -> "Классификация":0
+		"Заявка на ТУ":22 -> "Классификация":0
+		"Заявка на ТУ":23 -> "Классификация":0
+		"Заявка на ТУ":24 -> "Классификация":0
+		"Заявка на ТУ":25 -> "Классификация":0
+		"Заявка на ТУ":26 -> "Классификация":0
+		"Заявка на ТУ":27 -> "Договор с инвест условиями":0
+		"Заявка на ТУ":28 -> "Договор примыкания":0
+		"Заявка на ТУ":29 -> "Классификация":0
+		"Заявка на ТУ":30 -> "Классификация":0
+		"Заявка на ТУ":31 -> "Классификация":0
+		"Заявка на ТУ":32 -> "Классификация":0
+		"Заявка на ТУ":33 -> "Классификация":0
+		"Заявка на ТУ":34 -> "Классификация":0
+		"Заявка на ТУ":35 -> "Классификация":0
+		"Соответствие заявок на ТУ и Направлений погрузки":2 -> "Заявка на ТУ":0
+		"Соответствие заявок на ТУ и Направлений погрузки":3 -> "Направление погрузки":0
 	}
 	subgraph cluster_3 {
 		node [shape=plaintext style=filled]
 		color=blue
-		label=orchestrator
+		label=eim_corrects
 	}
 	subgraph cluster_3 {
 		node [shape=plaintext style=filled]
 		color=blue
-		label=orchestrator
-		"Интеграционный процесс" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0"><TR><TD bgcolor="green" PORT="0">Интеграционный процесс</TD></TR><TR><TD PORT="1">Код транзакции</TD></TR><TR><TD PORT="2">Время начала интеграционного процесса</TD></TR><TR><TD PORT="3">Время окончания интеграционного процесса</TD></TR><TR><TD PORT="4">Сообщение о результате интеграции</TD></TR><TR><TD PORT="5">Система-инициатор</TD></TR><TR><TD PORT="6">Ведомая система</TD></TR><TR><TD PORT="7">Результат интеграционного процесса</TD></TR></TABLE>>]
-		"Интеграционный процесс":5 -> "Классификация":0
-		"Интеграционный процесс":6 -> "Классификация":0
-		"Интеграционный процесс":0 -> "Классификация":0
-		"Интеграционный процесс":7 -> "Классификация":0
-	}
-	subgraph cluster_4 {
-		node [shape=plaintext style=filled]
-		color=blue
-		label=trans_energy
-	}
-	subgraph cluster_4 {
-		node [shape=plaintext style=filled]
-		color=blue
-		label=trans_energy
-		te_version [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0"><TR><TD bgcolor="green" PORT="0">te_version</TD></TR><TR><TD PORT="1">Форма</TD></TR></TABLE>>]
-		te_values [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0"><TR><TD bgcolor="green" PORT="0">te_values</TD></TR><TR><TD PORT="1">Суррогатный ключ</TD></TR><TR><TD PORT="2">Год</TD></TR><TR><TD PORT="3">Значение</TD></TR><TR><TD PORT="4">version_id</TD></TR><TR><TD PORT="5">Тип массива данных</TD></TR><TR><TD PORT="6">Организация</TD></TR><TR><TD PORT="7">Тип объекта</TD></TR><TR><TD PORT="8">Тип подвижного состава</TD></TR><TR><TD PORT="9">Тип мероприятия</TD></TR><TR><TD PORT="10">Единица измерения мероприятий</TD></TR></TABLE>>]
-		sliders [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0"><TR><TD bgcolor="green" PORT="0">sliders</TD></TR><TR><TD PORT="1">Суррогатный ключ</TD></TR><TR><TD PORT="2">Год</TD></TR><TR><TD PORT="3">Значение</TD></TR><TR><TD PORT="4">Признак блокировки</TD></TR><TR><TD PORT="5">version_id</TD></TR><TR><TD PORT="6">Тип массива данных</TD></TR><TR><TD PORT="7">Организация</TD></TR><TR><TD PORT="8">Тип объекта</TD></TR><TR><TD PORT="9">Тип подвижного состава</TD></TR></TABLE>>]
-		te_version:1 -> "Классификация":0
-		te_values:4 -> te_version:0
-		te_values:5 -> "Классификация":0
-		te_values:6 -> "Классификация":0
-		te_values:7 -> "Классификация":0
-		te_values:8 -> "Классификация":0
-		te_values:9 -> "Классификация":0
-		te_values:10 -> "Классификация":0
-		sliders:5 -> te_version:0
-		sliders:6 -> "Классификация":0
-		sliders:7 -> "Классификация":0
-		sliders:8 -> "Классификация":0
-		sliders:9 -> "Классификация":0
+		label=eim_corrects
+		"Поправка грузопотока" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0"><TR><TD bgcolor="green" PORT="0">Поправка грузопотока</TD></TR><TR><TD align="left" PORT="1">Сценарий погрузки</TD></TR><TR><TD align="left" PORT="2">Приоритет</TD></TR><TR><TD align="left" PORT="3">Год начала периода корректировки</TD></TR><TR><TD align="left" PORT="4">Год окончания периода корректировки</TD></TR><TR><TD align="left" PORT="5">Корректировка объема погрузки абсолютная</TD></TR><TR><TD align="left" PORT="6">Корректировка объема потока относительная</TD></TR><TR><TD align="left" PORT="7">Верхняя граница корректировки абсолютная</TD></TR><TR><TD align="left" PORT="8">Верхняя граница корректировки относительная</TD></TR></TABLE>>]
+		"Периметр корректировки в части группы груза" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0"><TR><TD bgcolor="green" PORT="0">Периметр корректировки в части группы груза</TD></TR><TR><TD align="left" PORT="1">Поправка грузопотока</TD></TR><TR><TD align="left" PORT="2">Группа груза</TD></TR></TABLE>>]
+		"Периметр корректировки в части укрупненной группы груза" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0"><TR><TD bgcolor="green" PORT="0">Периметр корректировки в части укрупненной группы груза</TD></TR><TR><TD align="left" PORT="1">Поправка грузопотока</TD></TR><TR><TD align="left" PORT="2">Укрупненная группа груза</TD></TR></TABLE>>]
+		"Периметр корректировки в части вида перевозки" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0"><TR><TD bgcolor="green" PORT="0">Периметр корректировки в части вида перевозки</TD></TR><TR><TD align="left" PORT="1">Поправка грузопотока</TD></TR><TR><TD align="left" PORT="2">Вид перевозки</TD></TR></TABLE>>]
+		"Периметр корректировки в части ЖД назначения" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0"><TR><TD bgcolor="green" PORT="0">Периметр корректировки в части ЖД назначения</TD></TR><TR><TD align="left" PORT="1">Поправка грузопотока</TD></TR><TR><TD align="left" PORT="2">Железная дорога отправления</TD></TR></TABLE>>]
+		"Периметр корректировки в части ЖД отправления" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0"><TR><TD bgcolor="green" PORT="0">Периметр корректировки в части ЖД отправления</TD></TR><TR><TD align="left" PORT="1">Группа груза</TD></TR><TR><TD align="left" PORT="2">Укрупненная группа груза</TD></TR></TABLE>>]
+		"Периметр корректировки в части группы груза":1 -> "Поправка грузопотока":0
+		"Периметр корректировки в части группы груза":2 -> "Классификация":0
+		"Периметр корректировки в части укрупненной группы груза":1 -> "Поправка грузопотока":0
+		"Периметр корректировки в части укрупненной группы груза":2 -> "Классификация":0
+		"Периметр корректировки в части вида перевозки":1 -> "Поправка грузопотока":0
+		"Периметр корректировки в части вида перевозки":2 -> "Классификация":0
+		"Периметр корректировки в части ЖД назначения":1 -> "Поправка грузопотока":0
+		"Периметр корректировки в части ЖД назначения":2 -> "Классификация":0
+		"Периметр корректировки в части ЖД отправления":1 -> "Классификация":0
+		"Периметр корректировки в части ЖД отправления":2 -> "Классификация":0
 	}
 }

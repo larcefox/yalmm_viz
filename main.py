@@ -1,160 +1,242 @@
 from yaml import safe_load
 import graphviz
+import argparse
 
 
-class model_draw:
-    def __init__(self) -> None:
-        self.logic_file_name = 'logic_model.yaml'
-        self.logic_file_dir_name = 'logic_model'
+arg_parser = argparse.ArgumentParser(
+    description="Yaml logic data models visualisation."
+)
+arg_parser.add_argument(
+    "-s",
+    "--simpl_edge_mode",
+    action="store_true",
+    help="genirates simple relation model",
+)
+arg_parser.add_argument(
+    "-c",
+    "--use_classification_table",
+    action="store_true",
+    help="genirates less relation for classigication table",
+)
+arg_parser.add_argument(
+    "-f",
+    "--show_fiz_name",
+    action="store_true",
+    help="shows fisical filds and table names",
+)
+arg_parser.add_argument(
+    "-l", "--graf_layout", help="graphviz layout name", default="dot"
+)
+arg_parser.add_argument(
+    "-ft", "--file_format", help="output file format", default="png"
+)
+args = arg_parser.parse_args()
+
+
+class Model_Draw:
+    def __init__(
+        self, 
+        simpl_edge_mode, 
+        use_classification_table, 
+        show_fiz_name, 
+        graf_layout,
+        file_format
+    ) -> None:
+        self.logic_file_name = "logic_model_pg.yaml"
+        self.logic_file_dir_name = "logic_model"
         self.yaml_data = self.get_data()
         self.graf_type = graphviz.Digraph
-        self.graf_layout = 'dot'
-        self.main_graph_name = 'logic_model'
+        self.graf_layout = graf_layout
+        self.main_graph_name = "logic_model"
+        self.file_format = file_format
         self.graf = self.make_main_graph()
         self.entities = self.get_entities()
         self.attributes = self.get_attributes()
         self.edge_maper = {}
         self.table_name_fild_style = 'bgcolor="green"'
-        self.classification_ref_fild_style = 'bgcolor="lightblue"'
-        self.classification_table = 'Классификация'
-        self.simpl_edge_mode = False
-        self.use_classification_table = False
+        self.classification_ref_fild_style = 'bgcolor="lightblue" align="left"'
+        self.fild_style = 'align="left"'
+        self.classification_table = "Классификация"
+        self.simpl_edge_mode = simpl_edge_mode
+        self.use_classification_table = use_classification_table
+        self.show_fiz_name = show_fiz_name
 
     def get_data(self) -> None:
-        with open(f'{self.logic_file_dir_name}/{self.logic_file_name}') as file:
-            return safe_load(file)
+        try:
+            with open(f"{self.logic_file_dir_name}/{self.logic_file_name}") as file:
+                return safe_load(file)
+        except FileNotFoundError:
+            print('File not found.')
+            exit()
 
     def get_entities(self) -> None:
-        self.entities = {}
-        for entity in self.yaml_data['Aliases']['Entities']:
-            self.entities[entity] = self.yaml_data['Aliases']['Entities'][entity]
+        return self.yaml_data["Aliases"]["Entities"]
 
     def get_attributes(self) -> None:
-        self.attributes = {}
-        for attribute in self.yaml_data['Aliases']['Attributes']:
-            self.attributes[attribute] = self.yaml_data['Aliases']['Attributes'][attribute]
+        return self.yaml_data["Aliases"]["Attributes"]
 
     def get_areas(self, yaml_data) -> dict:
-        return yaml_data['Tables']
+        return yaml_data["Tables"]
 
     def make_main_graph(self) -> None:
         return self.graf_type(
-            name=f'{self.main_graph_name}', 
-            node_attr={'fontname':'Helvetica'}, 
-            format='png',
-            graph_attr={'rankdir':'LR', 'ratio':'auto', 'layout':f'{self.graf_layout}'},
-            )
+            name=f"{self.main_graph_name}",
+            node_attr={"fontname": "Helvetica"},
+            format=self.file_format,
+            graph_attr={
+                "rankdir": "LR",
+                "ratio": "auto",
+                "layout": f"{self.graf_layout}",
+            },
+        )
 
     def make_subgraph(self, areas, area) -> graphviz.Graph:
-        with self.graf.subgraph(name=f'cluster_{list(areas.keys()).index(area)}') as subgraph:
-            subgraph.attr(color='blue')
+        with self.graf.subgraph(
+            name=f"cluster_{list(areas.keys()).index(area)}"
+        ) as subgraph:
+            subgraph.attr(color="blue")
             subgraph.attr(label=area)
-            subgraph.node_attr['style'] = 'filled'
-            subgraph.node_attr['shape'] = 'plaintext'
+            subgraph.node_attr["style"] = "filled"
+            subgraph.node_attr["shape"] = "plaintext"
             return subgraph
-    
-    def parse_columns(self, table_log_name, table_data) -> dict:
 
+    def parse_columns(self, table_log_name, table_data) -> dict:
         columns = {table_log_name: table_log_name}
 
         try:
-            if table_data['columns']:
-                columns |= table_data['columns']
+            if table_data["columns"]:
+                columns |= table_data["columns"]
             else:
                 raise KeyError
         except KeyError:
             pass
 
         try:
-            refs = table_data['refs']
+            refs = table_data["refs"]
             columns.update(refs)
         except KeyError:
             pass
 
         return columns
-    
+
     def make_edge_maper(self, table, columns) -> dict:
         self.edge_maper |= {table: {}}
         for column in columns:
             self.edge_maper[table] |= {column: list(columns.keys()).index(column)}
         return self.edge_maper
-
-    def fill_labels(self, columns,refs, table_log_name) -> list:
+    
+    def fill_labels(self, columns, refs, table_log_name) -> list:
         labels = []
 
         for column in columns:
+            # options
+            port = list(columns.keys()).index(column)
+            is_table_name = True if port == 0 else False
+            is_classification_table = True if table_log_name == self.classification_table else False
+            try:
+                is_classification_ref = True if self.classification_table in refs[column] else False
+            except (KeyError, TypeError):
+                is_classification_ref = False
 
-            if self.use_classification_table and list(columns.keys()).index(column) == 0 and table_log_name == self.classification_table:
-                style = self.classification_ref_fild_style
-                labels.append(f'<TR><TD {style} PORT="{list(columns.keys()).index(column)}">{column}</TD></TR>')
+            if is_table_name:
+                # tables blok
+                match (self.use_classification_table, is_classification_table):
+                    case (True, True):
+                        style = self.classification_ref_fild_style
+                    case _:
+                        style = self.table_name_fild_style
 
-            elif list(columns.keys()).index(column) == 0:
-                style = self.table_name_fild_style
-                labels.append(f'<TR><TD {style} PORT="{list(columns.keys()).index(column)}">{column}</TD></TR>')
-
-            elif self.use_classification_table and refs and column in refs and self.classification_table in refs[column]:
-                style = self.classification_ref_fild_style
-                labels.append(f'<TR><TD {style} PORT="{list(columns.keys()).index(column)}">{column}</TD></TR>')
+                if self.show_fiz_name:
+                    name = (
+                    f'{column}</TD><TD {style} PORT="{port}">{self.entities[column]}'
+                    if column in self.entities
+                    else f"{column}: {column}"
+                    )
+                else:
+                    name = column
 
             else:
-                labels.append(f'<TR><TD PORT="{list(columns.keys()).index(column)}">{column}</TD></TR>')
+                # filds blok
+                match (self.use_classification_table, is_classification_ref):
+                    case (True, True):
+                        style = self.classification_ref_fild_style
+                    case _:
+                        style = self.fild_style
+                
+                if self.show_fiz_name:
+                    name = (
+                    f'{column}</TD><TD {style} PORT="{port}">{self.attributes[column]}'
+                    if column in self.attributes
+                    else f"{column}: {column}"
+                )
+                else:
+                    name = column
 
-        """array1 [label=< 
-            <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0"> <TR>
-                <TD PORT="a1">A(1)</TD>
-                <TD PORT="a2">A(2)</TD>
-                <TD PORT="ax">A(...)</TD>
-                <TD PORT="an">A(n)</TD>
-            </TR> </TABLE>>];
-        """
+            if self.show_fiz_name:
+                labels.append(f'<TR><TD {style}>{name}</TD></TR>')
+            else:
+                labels.append(f'<TR><TD {style} PORT="{port}">{name}</TD></TR>')
+
         return labels
 
     def fill_nodes(self, table_log_name, labels, subgraph) -> None:
-            subgraph.node(table_log_name, f'<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">{"".join(labels)}</TABLE>>')
+        subgraph.node(
+            table_log_name,
+            f'<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">{"".join(labels)}</TABLE>>',
+        )
 
     def get_refs(self, table_data) -> dict | None:
-            try:
-                return table_data['refs']
-            except KeyError:
-                return None
-        
+        try:
+            return table_data["refs"]
+        except KeyError:
+            return None
+
     def fill_edges_simpl(self, tables, subgraph) -> None:
-        connections = set()
         for table in tables:
+            connections = set()
             try:
-                refs = tables[table]['refs']
+                refs = tables[table]["refs"]
                 for ref in refs:
                     connections.add(refs[ref].split(".")[0])
                 for connection in connections:
-                    # subgraph.edge(f'{table}:0', f'{connection}:0')
-                    subgraph.edge(f'{table}', f'{connection}')
+                    #subgraph.edge(f'{table}:0', f'{connection}:0')
+                    if self.simpl_edge_mode and connection == self.classification_table:
+                        pass
+                    else:
+                        subgraph.edge(f"{table}", f"{connection}")
             except KeyError:
                 pass
 
     def fill_edges(self, tables, subgraph, edge_maper) -> None:
         for table in tables:
             try:
-                refs = tables[table]['refs']
+                refs = tables[table]["refs"]
 
                 for ref in refs:
-                    current_table = table 
+                    current_table = table
                     current_fild_num = edge_maper[table][ref]
                     foreign_table = refs[ref].split(".")[0]
 
-                    if self.use_classification_table and foreign_table == self.classification_table:
+                    if (
+                        self.use_classification_table
+                        and foreign_table == self.classification_table
+                    ):
                         continue
-                    elif 'Суррогатный ключ' in refs[ref].split(".")[1]: 
-                        foreign_fild_num = 0 
+                    elif "Суррогатный ключ" in refs[ref].split(".")[1]:
+                        foreign_fild_num = 0
                     else:
                         foreign_fild_num = refs[ref].split(".")[1]
-                    
-                    subgraph.edge(f'{current_table}:{current_fild_num}', f'{foreign_table}:{foreign_fild_num}')
+
+                    subgraph.edge(
+                        f"{current_table}:{current_fild_num}",
+                        f"{foreign_table}:{foreign_fild_num}",
+                    )
 
             except KeyError:
                 pass
-    
+            
     def render_graph(self) -> None:
-        self.graf.render(directory='./viz')    
+        self.graf.render(directory="./viz")
 
     def draw(self) -> None:
         yaml_data = self.yaml_data
@@ -169,15 +251,16 @@ class model_draw:
                 refs = self.get_refs(tables[table])
                 labels = self.fill_labels(columns, refs, table)
                 self.fill_nodes(table, labels, subgraph)
-            
+
             if self.simpl_edge_mode:
-                self.fill_edges_simpl(tables, subgraph) 
-            else: 
+                self.fill_edges_simpl(tables, subgraph)
+            else:
                 self.fill_edges(tables, subgraph, edge_maper)
 
             self.graf.subgraph(subgraph)
         self.render_graph()
 
+
 if __name__ == "__main__":
-    draw = model_draw()
+    draw = Model_Draw(**args.__dict__)
     draw.draw()
