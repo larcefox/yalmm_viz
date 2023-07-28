@@ -30,6 +30,12 @@ arg_parser.add_argument(
 arg_parser.add_argument(
     "-ft", "--file_format", help="output file format", default="png"
 )
+arg_parser.add_argument(
+    "-t",
+    "--show_fild_type",
+    action="store_true",
+    help="shows filds types",
+)
 args = arg_parser.parse_args()
 
 
@@ -40,7 +46,8 @@ class Model_Draw:
         use_classification_table, 
         show_fiz_name, 
         graf_layout,
-        file_format
+        file_format,
+        show_fild_type
     ) -> None:
         self.logic_file_name = "logic_model_pg.yaml"
         self.logic_file_dir_name = "logic_model"
@@ -52,6 +59,7 @@ class Model_Draw:
         self.graf = self.make_main_graph()
         self.entities = self.get_entities()
         self.attributes = self.get_attributes()
+        self.domains = self.get_domains()
         self.edge_maper = {}
         self.table_name_fild_style = 'bgcolor="green"'
         self.classification_ref_fild_style = 'bgcolor="lightblue" align="left"'
@@ -60,6 +68,7 @@ class Model_Draw:
         self.simpl_edge_mode = simpl_edge_mode
         self.use_classification_table = use_classification_table
         self.show_fiz_name = show_fiz_name
+        self.show_fild_type = show_fild_type
 
     def get_data(self) -> None:
         try:
@@ -74,6 +83,9 @@ class Model_Draw:
 
     def get_attributes(self) -> None:
         return self.yaml_data["Aliases"]["Attributes"]
+    
+    def get_domains(self) -> None:
+        return self.yaml_data["Domains"]
 
     def get_areas(self, yaml_data) -> dict:
         return yaml_data["Tables"]
@@ -101,7 +113,7 @@ class Model_Draw:
             return subgraph
 
     def parse_columns(self, table_log_name, table_data) -> dict:
-        columns = {table_log_name: table_log_name}
+        columns = {f'T:{table_log_name}': table_log_name}
 
         try:
             if table_data["columns"]:
@@ -137,6 +149,8 @@ class Model_Draw:
                 is_classification_ref = True if self.classification_table in refs[column] else False
             except (KeyError, TypeError):
                 is_classification_ref = False
+            fild_type = columns[column] if port != 0 else "Table"
+            table_name = column.split(":")[1] if is_table_name else None
 
             if is_table_name:
                 # tables blok
@@ -146,14 +160,23 @@ class Model_Draw:
                     case _:
                         style = self.table_name_fild_style
 
-                if self.show_fiz_name:
-                    name = (
-                    f'{column}</TD><TD {style} PORT="{port}">{self.entities[column]}'
-                    if column in self.entities
-                    else f"{column}: {column}"
-                    )
-                else:
-                    name = column
+                match (self.show_fiz_name, self.show_fild_type):
+                    case (True, False):
+                        name = (
+                        f'{column}</TD><TD {style} PORT="{port}">{self.entities[table_name]}'
+                        if table_name in self.entities
+                        else f'{column}</TD><TD {style} PORT="{port}">{table_name}'
+                        )
+                    case (False, True):
+                        name = f'{column}</TD><TD {style} PORT="{port}"> Type'
+                    case (True, True):
+                        name = (
+                        f'{column}</TD><TD {style}>{self.entities[table_name]}</TD><TD {style} PORT="{port}"> Type'
+                        if table_name in self.entities
+                        else f'{column}</TD><TD {style}>{table_name}</TD><TD {style} PORT="{port}"> Type'
+                        )
+                    case _:
+                        name = column
 
             else:
                 # filds blok
@@ -162,20 +185,37 @@ class Model_Draw:
                         style = self.classification_ref_fild_style
                     case _:
                         style = self.fild_style
-                
-                if self.show_fiz_name:
-                    name = (
-                    f'{column}</TD><TD {style} PORT="{port}">{self.attributes[column]}'
-                    if column in self.attributes
-                    else f"{column}: {column}"
-                )
-                else:
-                    name = column
 
-            if self.show_fiz_name:
+                match (self.show_fiz_name, self.show_fild_type):
+                    case (True, False):
+                        name = (
+                        f'{column}</TD><TD {style} PORT="{port}">{self.attributes[column]}'
+                        if column in self.attributes
+                        else f'{column}</TD><TD {style} PORT="{port}">{column}'
+                    )
+                    case (False, True):
+                        fild_type = 'Суррогатный ключ' if 'Суррогатный ключ' in fild_type else fild_type
+                        name = (
+                        f'{column}</TD><TD {style} PORT="{port}">{self.domains[fild_type]["type"]}'
+                        if fild_type in self.domains
+                        else f'{column}</TD><TD {style} PORT="{port}">{column}'
+                    )
+                    case (True, True):
+                        fild_type = 'Суррогатный ключ' if 'Суррогатный ключ' in fild_type else fild_type
+                        name = (
+                        f'{column}</TD><TD {style}>{self.attributes[column]}</TD><TD {style} PORT="{port}">{self.domains[fild_type]["type"]}'
+                        if column in self.attributes
+                        else f'{column}</TD><TD {style}>{column}</TD><TD {style} PORT="{port}">{self.domains[fild_type]["type"]}'
+                    )
+                    case _:
+                        name = column
+
+            if self.show_fiz_name or self.show_fild_type:
                 labels.append(f'<TR><TD {style}>{name}</TD></TR>')
             else:
                 labels.append(f'<TR><TD {style} PORT="{port}">{name}</TD></TR>')
+
+            
 
         return labels
 
