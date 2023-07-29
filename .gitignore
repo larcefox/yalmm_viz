@@ -182,3 +182,6 @@ tags
 error.txt
 
 __pycache__
+
+# vscode temp
+.vscode
