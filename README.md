@@ -3,7 +3,7 @@
 pip install -r requirements.txt
 
 ## Use
-Generated files saves in vis folder.
+Generated files saves in vis folder. Source yaml files need to place in 'logic_model' folder.
 - Without parametrs shows all connections, saves in png format.
 - -s groups all connections between tables
 - -c exclude all connections to one table, connections shows connected filds in blue color. By default 'Классификация'
