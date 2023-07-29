@@ -1,6 +1,7 @@
 from yaml import safe_load
 import graphviz
 import argparse
+import regex as re
 
 
 arg_parser = argparse.ArgumentParser(
@@ -60,6 +61,7 @@ class Model_Draw:
         self.entities = self.get_entities()
         self.attributes = self.get_attributes()
         self.domains = self.get_domains()
+        self.templates = self.get_templates()
         self.edge_maper = {}
         self.table_name_fild_style = 'bgcolor="green"'
         self.classification_ref_fild_style = 'bgcolor="lightblue" align="left"'
@@ -80,6 +82,9 @@ class Model_Draw:
 
     def get_entities(self) -> None:
         return self.yaml_data["Aliases"]["Entities"]
+    
+    def get_templates(self) -> None:
+        return self.yaml_data["Templates"]
 
     def get_attributes(self) -> None:
         return self.yaml_data["Aliases"]["Attributes"]
@@ -113,23 +118,39 @@ class Model_Draw:
             return subgraph
 
     def parse_columns(self, table_log_name, table_data) -> dict:
-        columns = {f'T:{table_log_name}': table_log_name}
+        columns = {f'{table_log_name}': table_log_name}
 
         try:
-            if table_data["columns"]:
-                columns |= table_data["columns"]
-            else:
-                raise KeyError
-        except KeyError:
+            columns |= table_data["columns"]
+        except (KeyError, TypeError):
             pass
 
         try:
             refs = table_data["refs"]
             columns.update(refs)
-        except KeyError:
+        except (KeyError, TypeError):
             pass
 
-        return columns
+        while 'base' in table_data:
+            base_table = table_data['base']
+            table_data = self.templates[base_table]
+            try:
+                columns |= table_data["columns"]
+            except (KeyError, TypeError):
+                pass
+
+            try:
+                refs = table_data["refs"]
+                columns.update(refs)
+            except (KeyError, TypeError):
+                pass
+        for k, v in columns.items():
+            if '[' in columns[k]:
+                columns[k] = re.sub(r' \[[a-z]*\]', '', columns[k])
+                pass
+
+
+        return {table_log_name: columns}
 
     def make_edge_maper(self, table, columns) -> dict:
         self.edge_maper |= {table: {}}
@@ -149,8 +170,10 @@ class Model_Draw:
                 is_classification_ref = True if self.classification_table in refs[column] else False
             except (KeyError, TypeError):
                 is_classification_ref = False
-            fild_type = columns[column] if port != 0 else "Table"
-            table_name = column.split(":")[1] if is_table_name else None
+            try:
+                fild_type = columns[column].split('.')[1] if port != 0 else "Table"
+            except IndexError:
+                fild_type = columns[column] if port != 0 else "Table"
 
             if is_table_name:
                 # tables blok
@@ -163,17 +186,17 @@ class Model_Draw:
                 match (self.show_fiz_name, self.show_fild_type):
                     case (True, False):
                         name = (
-                        f'{column}</TD><TD {style} PORT="{port}">{self.entities[table_name]}'
-                        if table_name in self.entities
-                        else f'{column}</TD><TD {style} PORT="{port}">{table_name}'
+                        f'{column}</TD><TD {style} PORT="{port}">{self.entities[column]}'
+                        if column in self.entities
+                        else f'{column}</TD><TD {style} PORT="{port}">{column}'
                         )
                     case (False, True):
                         name = f'{column}</TD><TD {style} PORT="{port}"> Type'
                     case (True, True):
                         name = (
-                        f'{column}</TD><TD {style}>{self.entities[table_name]}</TD><TD {style} PORT="{port}"> Type'
-                        if table_name in self.entities
-                        else f'{column}</TD><TD {style}>{table_name}</TD><TD {style} PORT="{port}"> Type'
+                        f'{column}</TD><TD {style}>{self.entities[column]}</TD><TD {style} PORT="{port}"> Type'
+                        if column in self.entities
+                        else f'{column}</TD><TD {style}>{column}</TD><TD {style} PORT="{port}"> Type'
                         )
                     case _:
                         name = column
@@ -194,14 +217,12 @@ class Model_Draw:
                         else f'{column}</TD><TD {style} PORT="{port}">{column}'
                     )
                     case (False, True):
-                        fild_type = 'Суррогатный ключ' if 'Суррогатный ключ' in fild_type else fild_type
                         name = (
                         f'{column}</TD><TD {style} PORT="{port}">{self.domains[fild_type]["type"]}'
                         if fild_type in self.domains
                         else f'{column}</TD><TD {style} PORT="{port}">{column}'
                     )
                     case (True, True):
-                        fild_type = 'Суррогатный ключ' if 'Суррогатный ключ' in fild_type else fild_type
                         name = (
                         f'{column}</TD><TD {style}>{self.attributes[column]}</TD><TD {style} PORT="{port}">{self.domains[fild_type]["type"]}'
                         if column in self.attributes
@@ -214,8 +235,6 @@ class Model_Draw:
                 labels.append(f'<TR><TD {style}>{name}</TD></TR>')
             else:
                 labels.append(f'<TR><TD {style} PORT="{port}">{name}</TD></TR>')
-
-            
 
         return labels
 
@@ -239,7 +258,6 @@ class Model_Draw:
                 for ref in refs:
                     connections.add(refs[ref].split(".")[0])
                 for connection in connections:
-                    #subgraph.edge(f'{table}:0', f'{connection}:0')
                     if self.simpl_edge_mode and connection == self.classification_table:
                         pass
                     else:
@@ -256,16 +274,14 @@ class Model_Draw:
                     current_table = table
                     current_fild_num = edge_maper[table][ref]
                     foreign_table = refs[ref].split(".")[0]
+                    foreign_fild = refs[ref].split(".")[1]
+                    foreign_fild_num = edge_maper[foreign_table][foreign_fild]
 
                     if (
                         self.use_classification_table
                         and foreign_table == self.classification_table
                     ):
                         continue
-                    elif "Суррогатный ключ" in refs[ref].split(".")[1]:
-                        foreign_fild_num = 0
-                    else:
-                        foreign_fild_num = refs[ref].split(".")[1]
 
                     subgraph.edge(
                         f"{current_table}:{current_fild_num}",
@@ -281,15 +297,21 @@ class Model_Draw:
     def draw(self) -> None:
         yaml_data = self.yaml_data
         areas = self.get_areas(yaml_data)
+        columns = {}
+
+        for area in areas:
+            tables = areas[area]
+            for table in tables:
+                columns |= self.parse_columns(table, tables[table])
+                edge_maper = self.make_edge_maper(table, columns[table])
+
         for area in areas:
             subgraph = self.make_subgraph(areas, area)
             tables = areas[area]
 
             for table in tables:
-                columns = self.parse_columns(table, tables[table])
-                edge_maper = self.make_edge_maper(table, columns)
                 refs = self.get_refs(tables[table])
-                labels = self.fill_labels(columns, refs, table)
+                labels = self.fill_labels(columns[table], refs, table)
                 self.fill_nodes(table, labels, subgraph)
 
             if self.simpl_edge_mode:
