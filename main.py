@@ -104,6 +104,7 @@ class Model_Draw:
                 "rankdir": "LR",
                 "ratio": "auto",
                 "layout": f"{self.graf_layout}",
+                "fontsize": "25pt"
             },
         )
 
@@ -112,7 +113,9 @@ class Model_Draw:
             name=f"cluster_{list(areas.keys()).index(area)}"
         ) as subgraph:
             subgraph.attr(color="blue")
-            subgraph.attr(label=area)
+            subgraph.attr(label=f'< <B>{area}</B>>')
+            subgraph.node_attr["fontname"] = "Helvetica"
+            subgraph.node_attr["fontsize"] = "15pt"
             subgraph.node_attr["style"] = "filled"
             subgraph.node_attr["shape"] = "plaintext"
             return subgraph
@@ -131,11 +134,24 @@ class Model_Draw:
         except (KeyError, TypeError):
             pass
 
+        columns.update(self.parse_template(table_data, columns))
+
+        columns = self.clear_nulls(columns)
+
+        return {table_log_name: columns}
+    
+    def clear_nulls(self, columns) -> dict:
+        for k, v in columns.items():
+            if '[' in columns[k]:
+                columns[k] = re.sub(r' \[[a-z]*\]', '', columns[k])
+        return columns
+
+    def parse_template(self, table_data, columns):
         while 'base' in table_data:
             base_table = table_data['base']
             table_data = self.templates[base_table]
             try:
-                columns |= table_data["columns"]
+                columns.update(table_data["columns"])
             except (KeyError, TypeError):
                 pass
 
@@ -144,14 +160,8 @@ class Model_Draw:
                 columns.update(refs)
             except (KeyError, TypeError):
                 pass
-        for k, v in columns.items():
-            if '[' in columns[k]:
-                columns[k] = re.sub(r' \[[a-z]*\]', '', columns[k])
-                pass
-
-
-        return {table_log_name: columns}
-
+        return columns
+    
     def make_edge_maper(self, table, columns) -> dict:
         self.edge_maper |= {table: {}}
         for column in columns:
@@ -254,7 +264,18 @@ class Model_Draw:
         for table in tables:
             connections = set()
             try:
-                refs = tables[table]["refs"]
+                table_data = tables[table]
+                refs = table_data["refs"]
+  
+                #fill refs from templates
+                while 'base' in table_data:
+                    base_table = table_data['base']
+                    table_data = self.templates[base_table]
+                    try:
+                        refs.update(table_data["refs"])
+                    except (KeyError, TypeError):
+                        pass
+
                 for ref in refs:
                     connections.add(refs[ref].split(".")[0])
                 for connection in connections:
@@ -267,9 +288,20 @@ class Model_Draw:
 
     def fill_edges(self, tables, subgraph, edge_maper) -> None:
         for table in tables:
-            try:
-                refs = tables[table]["refs"]
+            table_data = tables[table]
+            if 'refs' in table_data:
+                refs = table_data["refs"]
 
+                #fill refs from templates
+                while 'base' in table_data:
+                    base_table = table_data['base']
+                    table_data = self.templates[base_table]
+                    try:
+                        refs.update(table_data["refs"])
+                    except (KeyError, TypeError):
+                        pass
+
+                refs = self.clear_nulls(refs)
                 for ref in refs:
                     current_table = table
                     current_fild_num = edge_maper[table][ref]
@@ -288,8 +320,6 @@ class Model_Draw:
                         f"{foreign_table}:{foreign_fild_num}",
                     )
 
-            except KeyError:
-                pass
             
     def render_graph(self) -> None:
         self.graf.render(directory="./viz")
