@@ -10,4 +10,4 @@ Generated files saves in 'vis' folder. Source yaml files need to place in 'logic
 - -f sows extra column with fisical names of filds
 - -f sows extra column with data types of filds
 - -l changes graphwith format. By default 'dot'
-- -ft changes file format
+- -ft changes file format (svg, pdf, png), png by default
