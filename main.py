@@ -26,10 +26,16 @@ arg_parser.add_argument(
     help="shows fisical filds and table names",
 )
 arg_parser.add_argument(
-    "-l", "--graf_layout", help="graphviz layout name", default="dot"
+    "-l",
+    "--graf_layout",
+    help="graphviz layout name",
+    default="dot"
 )
 arg_parser.add_argument(
-    "-ft", "--file_format", help="output file format", default="png"
+    "-o",
+    "--file_format",
+    help="output file format",
+    default="png"
 )
 arg_parser.add_argument(
     "-t",
@@ -37,10 +43,16 @@ arg_parser.add_argument(
     action="store_true",
     help="shows filds types",
 )
+arg_parser.add_argument(
+    "-area",
+    "--draw_area",
+    help="draw specified area",
+)
+
 args = arg_parser.parse_args()
 
 
-class Model_Draw:
+class MODEL_DRAW:
     def __init__(
         self, 
         simpl_edge_mode, 
@@ -48,7 +60,8 @@ class Model_Draw:
         show_fiz_name, 
         graf_layout,
         file_format,
-        show_fild_type
+        show_fild_type,
+        draw_area,
     ) -> None:
         self.logic_file_name = "logic_model_pg.yaml"
         self.logic_file_dir_name = "logic_model"
@@ -57,6 +70,7 @@ class Model_Draw:
         self.graf_layout = graf_layout
         self.main_graph_name = "logic_model"
         self.file_format = file_format
+        self.line_type = "true"
         self.graf = self.make_main_graph()
         self.entities = self.get_entities()
         self.attributes = self.get_attributes()
@@ -71,6 +85,11 @@ class Model_Draw:
         self.use_classification_table = use_classification_table
         self.show_fiz_name = show_fiz_name
         self.show_fild_type = show_fild_type
+        self.draw_area = draw_area
+        self.areas = self.get_areas(self.yaml_data)
+        self.attributes = self.get_attributes()
+        self.entities = self.get_entities()
+
 
     def get_data(self) -> None:
         try:
@@ -80,22 +99,22 @@ class Model_Draw:
             print('File not found.')
             exit()
 
-    def get_entities(self) -> None:
+    def get_entities(self) -> dict:
         return self.yaml_data["Aliases"]["Entities"]
     
-    def get_templates(self) -> None:
+    def get_templates(self) -> dict:
         return self.yaml_data["Templates"]
 
-    def get_attributes(self) -> None:
+    def get_attributes(self) -> dict:
         return self.yaml_data["Aliases"]["Attributes"]
     
-    def get_domains(self) -> None:
+    def get_domains(self) -> dict:
         return self.yaml_data["Domains"]
 
     def get_areas(self, yaml_data) -> dict:
         return yaml_data["Tables"]
 
-    def make_main_graph(self) -> None:
+    def make_main_graph(self) -> graphviz.Digraph:
         return self.graf_type(
             name=f"{self.main_graph_name}",
             node_attr={"fontname": "Helvetica"},
@@ -104,7 +123,11 @@ class Model_Draw:
                 "rankdir": "LR",
                 "ratio": "auto",
                 "layout": f"{self.graf_layout}",
-                "fontsize": "25pt"
+                "fontsize": "25pt",
+                "splines": self.line_type,
+                # "nodesep": "1",
+                # "ranksep": "1",
+                # "margine": "1"
             },
         )
 
@@ -112,6 +135,7 @@ class Model_Draw:
         with self.graf.subgraph(
             name=f"cluster_{list(areas.keys()).index(area)}"
         ) as subgraph:
+            subgraph.attr(margin="1.5,1.5")
             subgraph.attr(color="blue")
             subgraph.attr(label=f'< <B>{area}</B>>')
             subgraph.node_attr["fontname"] = "Helvetica"
@@ -139,11 +163,12 @@ class Model_Draw:
         columns = self.clear_nulls(columns)
 
         return {table_log_name: columns}
-    
-    def clear_nulls(self, columns) -> dict:
+
+    @staticmethod
+    def clear_nulls(columns) -> dict:
         for k, v in columns.items():
             if '[' in columns[k]:
-                columns[k] = re.sub(r' \[[a-z]*\]', '', columns[k])
+                columns[k] = re.sub(r' \[[a-z]* *[0-9]*\]', '', columns[k])
         return columns
 
     def parse_template(self, table_data, columns):
@@ -279,10 +304,10 @@ class Model_Draw:
                 for ref in refs:
                     connections.add(refs[ref].split(".")[0])
                 for connection in connections:
-                    if self.simpl_edge_mode and connection == self.classification_table:
+                    if self.use_classification_table and connection == self.classification_table:
                         pass
                     else:
-                        subgraph.edge(f"{table}", f"{connection}")
+                        subgraph.edge(f"{table}", f"{connection}", style="dashed")
             except KeyError:
                 pass
 
@@ -318,15 +343,32 @@ class Model_Draw:
                     subgraph.edge(
                         f"{current_table}:{current_fild_num}",
                         f"{foreign_table}:{foreign_fild_num}",
+                        style="dashed"
                     )
 
-            
     def render_graph(self) -> None:
         self.graf.render(directory="./viz")
 
+    def model_check(self):
+        columns = {}
+        areas = self.areas
+        entities = self.entities
+        attributes = self.attributes
+
+        for area in areas:
+            tables = areas[area]
+            for table in tables:
+                print(f'Area {area}, table: {table}')
+                columns |= self.parse_columns(table, tables[table])
+                print(f'Missed table: {table}') if table not in entities else 1
+
+                print('Missed columns: ')
+                for column in columns[table]:
+                    print(f'{column}') if column not in attributes else 1
+                print('')
+
     def draw(self) -> None:
-        yaml_data = self.yaml_data
-        areas = self.get_areas(yaml_data)
+        areas = self.areas
         columns = {}
 
         for area in areas:
@@ -349,10 +391,14 @@ class Model_Draw:
             else:
                 self.fill_edges(tables, subgraph, edge_maper)
 
-            self.graf.subgraph(subgraph)
+            if (self.draw_area):
+                if area == self.draw_area:
+                    self.graf.subgraph(subgraph)
+            else:
+                self.graf.subgraph(subgraph)
         self.render_graph()
 
 
 if __name__ == "__main__":
-    draw = Model_Draw(**args.__dict__)
+    draw = MODEL_DRAW(**args.__dict__)
     draw.draw()
