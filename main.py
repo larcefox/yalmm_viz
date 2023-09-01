@@ -138,7 +138,18 @@ class MODEL_DRAW:
             },
         )
 
-    def make_subgraph(self, areas, area, columns, edge_maper) -> graphviz.Graph:
+    def draw_area_check(self, areas, area, columns, edge_maper) -> None:
+        match (self.draw_area != None, self.draw_area == area):
+            case (True, True):
+                self.make_subgraph(areas, area, columns, edge_maper)
+
+            case(True, False):
+                pass
+
+            case (False, False):
+                self.make_subgraph(areas, area, columns, edge_maper)
+
+    def make_subgraph(self, areas, area, columns, edge_maper) -> None:
         with self.graf.subgraph(
             name=f"cluster_{list(areas.keys()).index(area)}"
         ) as subgraph:
@@ -410,7 +421,7 @@ class MODEL_DRAW:
                 columns |= self.parse_columns(table, tables[table])
                 edge_maper = self.make_edge_maper(table, columns[table])
         for area in areas:
-            self.make_subgraph(areas, area, columns, edge_maper)
+            self.draw_area_check(areas, area, columns, edge_maper)
         self.render_graph()
 
 
