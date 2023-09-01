@@ -48,6 +48,11 @@ arg_parser.add_argument(
     "--draw_area",
     help="draw specified area",
 )
+arg_parser.add_argument(
+    "-j",
+    "--line_type",
+    help="draw specified line types",
+)
 
 args = arg_parser.parse_args()
 
@@ -62,15 +67,16 @@ class MODEL_DRAW:
         file_format,
         show_fild_type,
         draw_area,
+        line_type="true"
     ) -> None:
-        self.logic_file_name = "logic_model_pg.yaml"
+        self.logic_file_name = "logic_model_eim_full.yaml"
         self.logic_file_dir_name = "logic_model"
         self.yaml_data = self.get_data()
         self.graf_type = graphviz.Digraph
         self.graf_layout = graf_layout
         self.main_graph_name = "logic_model"
         self.file_format = file_format
-        self.line_type = "true"
+        self.line_type = line_type  # true (default) ortho curved polyline line
         self.graf = self.make_main_graph()
         self.entities = self.get_entities()
         self.attributes = self.get_attributes()
@@ -126,26 +132,27 @@ class MODEL_DRAW:
                 "fontsize": "25pt",
                 "splines": self.line_type,
                 # "nodesep": "1",
-                # "ranksep": "1",
-                # "margine": "1"
+                "ranksep": "3",
+                # "margine": "1",
+                "newrank": "true"
             },
         )
 
-    def make_subgraph(self, areas, area) -> graphviz.Graph:
+    def make_subgraph(self, areas, area, columns, edge_maper) -> graphviz.Graph:
         with self.graf.subgraph(
             name=f"cluster_{list(areas.keys()).index(area)}"
         ) as subgraph:
             subgraph.attr(margin="1.5,1.5")
             subgraph.attr(color="blue")
-            subgraph.attr(label=f'< <B>{area}</B>>')
+            subgraph.attr(label=f'< <B>{area}</B> >')
             subgraph.node_attr["fontname"] = "Helvetica"
             subgraph.node_attr["fontsize"] = "15pt"
             subgraph.node_attr["style"] = "filled"
             subgraph.node_attr["shape"] = "plaintext"
-            return subgraph
+            self.fill_gv_file(subgraph, areas, area, columns, edge_maper)
 
     def parse_columns(self, table_log_name, table_data) -> dict:
-        columns = {f'{table_log_name}': table_log_name}
+        columns = {f'{table_log_name}': 'Table'}
 
         try:
             columns |= table_data["columns"]
@@ -166,10 +173,13 @@ class MODEL_DRAW:
 
     @staticmethod
     def clear_nulls(columns) -> dict:
-        for k, v in columns.items():
-            if '[' in columns[k]:
-                columns[k] = re.sub(r' \[[a-z]* *[0-9]*\]', '', columns[k])
-        return columns
+        try:
+            for k, v in columns.items():
+                if '[' in columns[k]:
+                    columns[k] = re.sub(r' \[[a-z]* *[0-9]*\]', '', columns[k])
+            return columns
+        except AttributeError:
+            pass
 
     def parse_template(self, table_data, columns):
         while 'base' in table_data:
@@ -298,7 +308,7 @@ class MODEL_DRAW:
                     table_data = self.templates[base_table]
                     try:
                         refs.update(table_data["refs"])
-                    except (KeyError, TypeError):
+                    except (KeyError, TypeError, AttributeError):
                         pass
 
                 for ref in refs:
@@ -307,8 +317,8 @@ class MODEL_DRAW:
                     if self.use_classification_table and connection == self.classification_table:
                         pass
                     else:
-                        subgraph.edge(f"{table}", f"{connection}", style="dashed")
-            except KeyError:
+                        subgraph.edge(f"{table}", f"{connection}", style="dashed", arrowsize="1", penwidth="1")
+            except (KeyError, TypeError):
                 pass
 
     def fill_edges(self, tables, subgraph, edge_maper) -> None:
@@ -323,28 +333,33 @@ class MODEL_DRAW:
                     table_data = self.templates[base_table]
                     try:
                         refs.update(table_data["refs"])
-                    except (KeyError, TypeError):
+                    except (KeyError, TypeError, AttributeError):
                         pass
 
                 refs = self.clear_nulls(refs)
-                for ref in refs:
-                    current_table = table
-                    current_fild_num = edge_maper[table][ref]
-                    foreign_table = refs[ref].split(".")[0]
-                    foreign_fild = refs[ref].split(".")[1]
-                    foreign_fild_num = edge_maper[foreign_table][foreign_fild]
+                try:
+                    for ref in refs:
+                        current_table = table
+                        current_fild_num = edge_maper[table][ref]
+                        foreign_table = refs[ref].split(".")[0]
+                        foreign_fild = refs[ref].split(".")[1]
+                        foreign_fild_num = edge_maper[foreign_table][foreign_fild]
 
-                    if (
-                        self.use_classification_table
-                        and foreign_table == self.classification_table
-                    ):
-                        continue
+                        if (
+                            self.use_classification_table
+                            and foreign_table == self.classification_table
+                        ):
+                            continue
 
-                    subgraph.edge(
-                        f"{current_table}:{current_fild_num}",
-                        f"{foreign_table}:{foreign_fild_num}",
-                        style="dashed"
-                    )
+                        subgraph.edge(
+                            f"{current_table}:{current_fild_num}",
+                            f"{foreign_table}:{foreign_fild_num}",
+                            style="dashed",
+                            arrowsize="1",
+                            penwidth="1"
+                        )
+                except TypeError:
+                    pass
 
     def render_graph(self) -> None:
         self.graf.render(directory="./viz")
@@ -364,41 +379,43 @@ class MODEL_DRAW:
 
                 print('Missed columns: ')
                 for column in columns[table]:
-                    print(f'{column}') if column not in attributes else 1
+                    if columns[table][column] != 'Table':
+                        print(f'{column}') if column not in attributes else 1
                 print('')
 
+    def fill_gv_file(self, subgraph, areas, area, columns, edge_maper):
+
+        tables = areas[area]
+
+        for table in tables:
+            refs = self.get_refs(tables[table])
+            labels = self.fill_labels(columns[table], refs, table)
+            self.fill_nodes(table, labels, subgraph)
+
+        if self.simpl_edge_mode:
+            self.fill_edges_simpl(tables, subgraph)
+        else:
+            self.fill_edges(tables, subgraph, edge_maper)
+
     def draw(self) -> None:
+
+        self.model_check()
         areas = self.areas
         columns = {}
+        edge_maper = {}
 
         for area in areas:
             tables = areas[area]
             for table in tables:
                 columns |= self.parse_columns(table, tables[table])
                 edge_maper = self.make_edge_maper(table, columns[table])
-
         for area in areas:
-            subgraph = self.make_subgraph(areas, area)
-            tables = areas[area]
-
-            for table in tables:
-                refs = self.get_refs(tables[table])
-                labels = self.fill_labels(columns[table], refs, table)
-                self.fill_nodes(table, labels, subgraph)
-
-            if self.simpl_edge_mode:
-                self.fill_edges_simpl(tables, subgraph)
-            else:
-                self.fill_edges(tables, subgraph, edge_maper)
-
-            if (self.draw_area):
-                if area == self.draw_area:
-                    self.graf.subgraph(subgraph)
-            else:
-                self.graf.subgraph(subgraph)
+            self.make_subgraph(areas, area, columns, edge_maper)
         self.render_graph()
+
 
 
 if __name__ == "__main__":
     draw = MODEL_DRAW(**args.__dict__)
+    draw.model_check()
     draw.draw()

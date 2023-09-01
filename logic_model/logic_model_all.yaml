@@ -1,0 +1,3318 @@
+extension plpgsql:
+  description: PL/pgSQL procedural language
+  owner: postgres
+  schema: pg_catalog
+  version: '1.0'
+schema eim:
+  owner: postgres
+  privileges: []
+  sequence classification_to_classification_id_seq:
+    cache_value: 1
+    increment_by: 1
+    max_value: null
+    min_value: null
+    owner: postgres
+    owner_column: id
+    owner_table: classification_to_classification
+    start_value: 1
+  table account:
+    columns:
+    - id:
+        not_null: true
+        type: bigint
+    - name:
+        not_null: true
+        type: character varying(40)
+    - last_nm:
+        not_null: true
+        type: character varying(40)
+    - first_nm:
+        not_null: true
+        type: character varying(40)
+    - middle_nm:
+        not_null: true
+        type: character varying(40)
+    - birth_dt:
+        type: date
+    - position_id:
+        not_null: true
+        type: bigint
+    - department_id:
+        not_null: true
+        type: bigint
+    - email:
+        not_null: true
+        type: character varying(40)
+    - phone:
+        type: character varying(40)
+    - pwd_hash:
+        type: character varying(4096)
+    - pwd_hash_alg_id:
+        not_null: true
+        type: bigint
+    - ooo_status_id:
+        not_null: true
+        type: bigint
+    - status_id:
+        not_null: true
+        type: bigint
+    - expire_plan_dt:
+        not_null: true
+        type: date
+    - create_ts:
+        default: now()
+        not_null: true
+        type: timestamp with time zone
+    - update_ts:
+        type: timestamp with time zone
+    - end_ts:
+        default: '''infinity''::timestamp with time zone'
+        not_null: true
+        type: timestamp with time zone
+    - create_user_id:
+        type: bigint
+    - update_user_id:
+        type: bigint
+    - access_memorandum_no:
+        default: '''''::character varying'
+        not_null: true
+        type: character varying(500)
+    - failed_login_cnt:
+        default: '0'
+        not_null: true
+        type: integer
+    - account_lock_ts:
+        type: timestamp with time zone
+    foreign_keys:
+      fk_account_ooo_status:
+        columns:
+        - ooo_status_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: classification
+      fk_account_status:
+        columns:
+        - status_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: classification
+      fk_expert_position:
+        columns:
+        - position_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: classification
+      fk_pwd_hash_algorythm:
+        columns:
+        - pwd_hash_alg_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: classification
+      fk_user_create_user:
+        columns:
+        - create_user_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: account
+      fk_user_department:
+        columns:
+        - department_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: classification
+      fk_user_update_user:
+        columns:
+        - update_user_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: account
+    owner: postgres
+    primary_key:
+      account_pkey:
+        columns:
+        - id
+  table account_ooo:
+    columns:
+    - id:
+        not_null: true
+        type: bigint
+    - account_id:
+        not_null: true
+        type: bigint
+    - ooo_begin_dt:
+        not_null: true
+        type: date
+    - ooo_end_dt:
+        not_null: true
+        type: date
+    - deputy_id:
+        not_null: true
+        type: bigint
+    - create_ts:
+        default: now()
+        not_null: true
+        type: timestamp with time zone
+    - update_ts:
+        type: timestamp with time zone
+    - end_ts:
+        default: '''infinity''::timestamp with time zone'
+        not_null: true
+        type: timestamp with time zone
+    foreign_keys:
+      fk_ooo_account:
+        columns:
+        - account_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: account
+      fk_ooo_deputy:
+        columns:
+        - deputy_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: account
+    owner: postgres
+    primary_key:
+      account_ooo_pkey:
+        columns:
+        - id
+  table account_role:
+    columns:
+    - id:
+        not_null: true
+        type: bigint
+    - account_id:
+        not_null: true
+        type: bigint
+    - role_id:
+        not_null: true
+        type: bigint
+    - create_ts:
+        default: now()
+        not_null: true
+        type: timestamp with time zone
+    - update_ts:
+        type: timestamp with time zone
+    - end_ts:
+        default: '''infinity''::timestamp with time zone'
+        not_null: true
+        type: timestamp with time zone
+    - create_user_id:
+        type: bigint
+    - update_user_id:
+        type: bigint
+    - expire_role_dt:
+        type: date
+    foreign_keys:
+      fk_account_role:
+        columns:
+        - role_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: classification
+      fk_account_role_user:
+        columns:
+        - account_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: account
+      fk_role_cru:
+        columns:
+        - create_user_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: account
+      fk_role_uu:
+        columns:
+        - update_user_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: account
+    owner: postgres
+    primary_key:
+      account_role_pkey:
+        columns:
+        - id
+  table account_status:
+    columns:
+    - id:
+        not_null: true
+        type: bigint
+    - account_id:
+        not_null: true
+        type: bigint
+    - status_id:
+        not_null: true
+        type: bigint
+    - create_ts:
+        default: now()
+        not_null: true
+        type: timestamp with time zone
+    - update_ts:
+        type: timestamp with time zone
+    - end_ts:
+        default: '''infinity''::timestamp with time zone'
+        not_null: true
+        type: timestamp with time zone
+    - create_user_id:
+        type: bigint
+    - update_user_id:
+        type: bigint
+    foreign_keys:
+      fk_account_status2:
+        columns:
+        - account_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: account
+      fk_account_status_cru:
+        columns:
+        - create_user_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: account
+      fk_account_status_hist:
+        columns:
+        - status_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: classification
+      fk_account_status_uu:
+        columns:
+        - update_user_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: account
+    owner: postgres
+    primary_key:
+      account_status_pkey:
+        columns:
+        - id
+  table admin_audit:
+    columns:
+    - id:
+        not_null: true
+        type: bigint
+    - admin_id:
+        not_null: true
+        type: bigint
+    - admin_nm:
+        not_null: true
+        type: character varying(400)
+    - admin_dept_nm:
+        not_null: true
+        type: character varying(400)
+    - admin_login:
+        not_null: true
+        type: character varying(400)
+    - user_id:
+        not_null: true
+        type: bigint
+    - user_login:
+        not_null: true
+        type: character varying(400)
+    - user_nm:
+        not_null: true
+        type: character varying(400)
+    - user_dept_nm:
+        not_null: true
+        type: character varying(400)
+    - user_session_id:
+        not_null: true
+        type: bigint
+    - ip_address:
+        not_null: true
+        type: character varying(40)
+    - opr_dsc:
+        not_null: true
+        type: character varying(400)
+    - create_ts:
+        default: now()
+        not_null: true
+        type: timestamp with time zone
+    - update_ts:
+        type: timestamp with time zone
+    - end_ts:
+        default: '''infinity''::timestamp with time zone'
+        not_null: true
+        type: timestamp with time zone
+    foreign_keys:
+      fk_admin_audit_admin:
+        columns:
+        - admin_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: account
+      fk_admin_audit_session:
+        columns:
+        - user_session_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: user_session
+      fk_admin_audit_subject:
+        columns:
+        - user_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: account
+    owner: postgres
+    primary_key:
+      admin_audit_pkey:
+        columns:
+        - id
+  table classification:
+    columns:
+    - id:
+        not_null: true
+        type: bigint
+    - dimension_id:
+        type: bigint
+    - parent_id:
+        type: bigint
+    - object_tp_id:
+        type: bigint
+    - code:
+        not_null: true
+        type: character varying(400)
+    - name:
+        default: '''''::character varying'
+        not_null: true
+        type: character varying(400)
+    - description:
+        type: character varying(4000)
+    - update_ts:
+        type: timestamp with time zone
+    - end_ts:
+        default: '''infinity''::timestamp with time zone'
+        not_null: true
+        type: timestamp with time zone
+    - create_ts:
+        default: now()
+        not_null: true
+        type: timestamp with time zone
+    - create_user_id:
+        type: bigint
+    - update_user_id:
+        type: bigint
+    - rank:
+        type: integer
+    foreign_keys:
+      fk_cl_create_user:
+        columns:
+        - create_user_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: account
+      fk_cl_update_user:
+        columns:
+        - update_user_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: account
+      fk_dim:
+        columns:
+        - dimension_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: dimension
+      fk_parent_cl:
+        columns:
+        - parent_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: classification
+      fl_cl_tp:
+        columns:
+        - object_tp_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: classification
+    owner: postgres
+    primary_key:
+      classification_pkey:
+        columns:
+        - id
+  table classification_to_classification:
+    columns:
+    - id:
+        default: nextval('eim.classification_to_classification_id_seq'::regclass)
+        not_null: true
+        type: bigint
+    - object_id:
+        not_null: true
+        type: bigint
+    - subject_id:
+        not_null: true
+        type: bigint
+    - relation_tp_id:
+        type: bigint
+    - rank:
+        type: integer
+    - create_ts:
+        default: now()
+        not_null: true
+        type: timestamp with time zone
+    - update_ts:
+        type: timestamp with time zone
+    - end_ts:
+        default: '''infinity''::timestamp with time zone'
+        not_null: true
+        type: timestamp with time zone
+    foreign_keys:
+      fk_clxcl_object:
+        columns:
+        - object_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: classification
+      fk_clxcl_subject:
+        columns:
+        - subject_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: classification
+      fk_clxcl_type:
+        columns:
+        - relation_tp_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: classification
+    owner: postgres
+    primary_key:
+      classification_to_classification_pkey:
+        columns:
+        - id
+  table dimension:
+    columns:
+    - id:
+        not_null: true
+        type: bigint
+    - code:
+        type: character varying(40)
+    - name:
+        not_null: true
+        type: character varying(400)
+    - description:
+        type: character varying(4000)
+    - create_ts:
+        default: now()
+        not_null: true
+        type: timestamp with time zone
+    - update_ts:
+        type: timestamp with time zone
+    - end_ts:
+        default: '''infinity''::timestamp with time zone'
+        not_null: true
+        type: timestamp with time zone
+    - create_user_id:
+        type: bigint
+    - update_user_id:
+        type: bigint
+    foreign_keys:
+      fk_dim_create_user:
+        columns:
+        - create_user_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: account
+      fk_dim_update_user:
+        columns:
+        - update_user_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: account
+    owner: postgres
+    primary_key:
+      dimension_pkey:
+        columns:
+        - id
+  table edge:
+    columns:
+    - id:
+        not_null: true
+        type: bigint
+    - polygon_id:
+        not_null: true
+        type: bigint
+    - station_from_id:
+        not_null: true
+        type: bigint
+    - station_to_id:
+        not_null: true
+        type: bigint
+    - create_ts:
+        default: now()
+        not_null: true
+        type: timestamp with time zone
+    - update_ts:
+        type: timestamp with time zone
+    - end_ts:
+        default: '''infinity''::timestamp with time zone'
+        not_null: true
+        type: timestamp with time zone
+    - code:
+        type: character varying(40)
+    - name:
+        type: character varying(400)
+    - hl_net_ind:
+        default: 'false'
+        not_null: true
+        type: boolean
+    - reg_konca_per:
+        type: character varying(400)
+    - parent_edge_id:
+        type: bigint
+    - region_from_id:
+        type: bigint
+    - region_to_id:
+        type: bigint
+    foreign_keys:
+      fk_39:
+        columns:
+        - region_from_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: classification
+      fk_40:
+        columns:
+        - region_to_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: classification
+      fk_edge_polygon:
+        columns:
+        - polygon_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: classification
+      fk_edge_stfrom:
+        columns:
+        - station_from_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: station
+      fk_edge_stto:
+        columns:
+        - station_to_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: station
+      fk_parent_edge:
+        columns:
+        - parent_edge_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: edge
+    owner: postgres
+    primary_key:
+      edge_pkey:
+        columns:
+        - id
+  table edge_detail:
+    columns:
+    - id:
+        not_null: true
+        type: bigint
+    - scenario_id:
+        not_null: true
+        type: bigint
+    - start_id:
+        not_null: true
+        type: integer
+    - end_id:
+        not_null: true
+        type: integer
+    - year:
+        not_null: true
+        type: integer
+    - train:
+        not_null: true
+        type: double precision
+    - empty:
+        not_null: true
+        type: double precision
+    - capacity:
+        not_null: true
+        type: double precision
+    - n_train:
+        not_null: true
+        type: double precision
+    - n_empty:
+        not_null: true
+        type: double precision
+    - delta:
+        not_null: true
+        type: double precision
+    - delta_delta:
+        not_null: true
+        type: double precision
+    - start_name:
+        not_null: true
+        type: character varying(400)
+    - start_ers:
+        not_null: true
+        type: integer
+    - end_name:
+        not_null: true
+        type: character varying(400)
+    - end_esr:
+        not_null: true
+        type: integer
+    - passport_end:
+        not_null: true
+        type: integer
+    - passport_start:
+        not_null: true
+        type: integer
+    - dor_name:
+        not_null: true
+        type: character varying(40)
+    - dor_kod:
+        not_null: true
+        type: integer
+    - span_number:
+        not_null: true
+        type: integer
+    - create_ts:
+        default: now()
+        not_null: true
+        type: timestamp with time zone
+    - update_ts:
+        type: timestamp with time zone
+    - end_ts:
+        default: '''infinity''::timestamp with time zone'
+        not_null: true
+        type: timestamp with time zone
+    - hl_start_id:
+        not_null: true
+        type: integer
+    - hl_end_id:
+        not_null: true
+        type: integer
+    foreign_keys:
+      fk_detail_edge_scenario:
+        columns:
+        - scenario_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: scenario
+    owner: postgres
+    primary_key:
+      edge_detail_pkey:
+        columns:
+        - id
+  table idx_value:
+    check_constraints:
+      idx_value_year_check:
+        columns:
+        - year
+        expression: (year > 1900)
+    columns:
+    - id:
+        not_null: true
+        type: bigint
+    - macro_scenario_id:
+        not_null: true
+        type: bigint
+    - idx_tp_id:
+        not_null: true
+        type: bigint
+    - year:
+        not_null: true
+        type: integer
+    - val:
+        not_null: true
+        type: double precision
+    - create_ts:
+        default: now()
+        not_null: true
+        type: timestamp with time zone
+    - update_ts:
+        type: timestamp with time zone
+    - end_ts:
+        default: '''infinity''::timestamp with time zone'
+        not_null: true
+        type: timestamp with time zone
+    foreign_keys:
+      fk_15:
+        columns:
+        - macro_scenario_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: macro_scenario
+      fk_16:
+        columns:
+        - idx_tp_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: classification
+    owner: postgres
+    primary_key:
+      idx_value_pkey:
+        columns:
+        - id
+  table income_tax:
+    check_constraints:
+      income_tax_year_check:
+        columns:
+        - year
+        expression: (year > 1900)
+    columns:
+    - id:
+        not_null: true
+        type: bigint
+    - tax_id:
+        not_null: true
+        type: bigint
+    - year:
+        not_null: true
+        type: integer
+    - tax_rate:
+        not_null: true
+        type: double precision
+    - fed_share:
+        not_null: true
+        type: double precision
+    - payment_period:
+        not_null: true
+        type: integer
+    - create_ts:
+        default: now()
+        not_null: true
+        type: timestamp with time zone
+    - update_ts:
+        type: timestamp with time zone
+    - end_ts:
+        default: '''infinity''::timestamp with time zone'
+        not_null: true
+        type: timestamp with time zone
+    foreign_keys:
+      fk_20:
+        columns:
+        - tax_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: tax
+    owner: postgres
+    primary_key:
+      income_tax_pkey:
+        columns:
+        - id
+  table integration_process:
+    columns:
+    - id:
+        not_null: true
+        type: bigint
+    - transaction_id:
+        type: uuid
+    - master_system_id:
+        not_null: true
+        type: bigint
+    - slave_system_id:
+        not_null: true
+        type: bigint
+    - process_id:
+        not_null: true
+        type: bigint
+    - process_start_ts:
+        not_null: true
+        type: timestamp with time zone
+    - process_end_ts:
+        type: timestamp with time zone
+    - process_result_id:
+        not_null: true
+        type: bigint
+    - process_msg:
+        type: character varying(4000)
+    - create_ts:
+        default: now()
+        not_null: true
+        type: timestamp with time zone
+    - update_ts:
+        type: timestamp with time zone
+    - end_ts:
+        default: '''infinity''::timestamp with time zone'
+        not_null: true
+        type: timestamp with time zone
+    - create_user_id:
+        type: bigint
+    - update_user_id:
+        type: bigint
+    foreign_keys:
+      fk_4:
+        columns:
+        - master_system_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: classification
+      fk_5:
+        columns:
+        - slave_system_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: classification
+      fk_6:
+        columns:
+        - process_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: classification
+      fk_7:
+        columns:
+        - process_result_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: classification
+      fk_integration_cru:
+        columns:
+        - create_user_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: account
+      fk_integration_uu:
+        columns:
+        - update_user_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: account
+    owner: postgres
+    primary_key:
+      integration_process_pkey:
+        columns:
+        - id
+  table investment_project:
+    check_constraints:
+      investment_project_version_num_check:
+        columns:
+        - version_num
+        expression: (version_num > 0)
+    columns:
+    - id:
+        not_null: true
+        type: bigint
+    - name:
+        not_null: true
+        type: character varying(400)
+    - description:
+        not_null: true
+        type: character varying(4000)
+    - version_num:
+        default: '1'
+        not_null: true
+        type: integer
+    - version_letter:
+        default: '''A''::character varying'
+        not_null: true
+        type: character varying(1)
+    - parent_investment_project_id:
+        type: bigint
+    - polygon_id:
+        not_null: true
+        type: bigint
+    - func_cst_id:
+        not_null: true
+        type: bigint
+    - ip_inclusion_tp_id:
+        not_null: true
+        type: bigint
+    - asset_tp_id:
+        not_null: true
+        type: bigint
+    - goal_tp_id:
+        not_null: true
+        type: bigint
+    - purpose_tp_id:
+        not_null: true
+        type: bigint
+    - prj_func_tp_id:
+        not_null: true
+        type: bigint
+    - phase_tp_id:
+        not_null: true
+        type: bigint
+    - create_ts:
+        default: now()
+        not_null: true
+        type: timestamp with time zone
+    - update_ts:
+        type: timestamp with time zone
+    - end_ts:
+        default: '''infinity''::timestamp with time zone'
+        not_null: true
+        type: timestamp with time zone
+    - create_user_id:
+        type: bigint
+    - update_user_id:
+        type: bigint
+    foreign_keys:
+      fk_iprj_asset_tp:
+        columns:
+        - asset_tp_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: classification
+      fk_iprj_create_user:
+        columns:
+        - create_user_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: account
+      fk_iprj_cst:
+        columns:
+        - func_cst_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: classification
+      fk_iprj_func_tp:
+        columns:
+        - prj_func_tp_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: classification
+      fk_iprj_goal_tp:
+        columns:
+        - goal_tp_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: classification
+      fk_iprj_inclusion_tp:
+        columns:
+        - ip_inclusion_tp_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: classification
+      fk_iprj_polygon:
+        columns:
+        - polygon_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: classification
+      fk_iprj_purpose_tp:
+        columns:
+        - purpose_tp_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: classification
+      fk_iprj_stage_tp:
+        columns:
+        - phase_tp_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: classification
+      fk_iprj_update_user:
+        columns:
+        - update_user_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: account
+      fk_parent_iprj:
+        columns:
+        - parent_investment_project_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: investment_project
+    owner: postgres
+    primary_key:
+      investment_project_pkey:
+        columns:
+        - id
+  table investment_project_fund:
+    check_constraints:
+      investment_project_fund_year_check:
+        columns:
+        - year
+        expression: (year > 1900)
+    columns:
+    - id:
+        not_null: true
+        type: bigint
+    - investment_project_id:
+        not_null: true
+        type: bigint
+    - name:
+        not_null: true
+        type: character varying(400)
+    - funding_tp_id:
+        not_null: true
+        type: bigint
+    - year:
+        not_null: true
+        type: integer
+    - investment_amt:
+        default: '0'
+        not_null: true
+        type: double precision
+    - loan_rate:
+        type: double precision
+    - loan_period:
+        type: integer
+    - repayment_tp_id:
+        type: bigint
+    - priviledge_duration:
+        type: integer
+    - priviledge_loan_rate:
+        type: double precision
+    - create_ts:
+        default: now()
+        not_null: true
+        type: timestamp with time zone
+    - update_ts:
+        type: timestamp with time zone
+    - end_ts:
+        default: '''infinity''::timestamp with time zone'
+        not_null: true
+        type: timestamp with time zone
+    foreign_keys:
+      fk_iprj_funding_body_repayment_tp:
+        columns:
+        - repayment_tp_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: classification
+      fk_iprj_funding_tp:
+        columns:
+        - funding_tp_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: classification
+      fk_iprjfund:
+        columns:
+        - investment_project_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: investment_project
+    owner: postgres
+    primary_key:
+      investment_project_fund_pkey:
+        columns:
+        - id
+  table land_tax:
+    check_constraints:
+      land_tax_year_check:
+        columns:
+        - year
+        expression: (year > 1900)
+    columns:
+    - id:
+        not_null: true
+        type: bigint
+    - tax_id:
+        not_null: true
+        type: bigint
+    - year:
+        not_null: true
+        type: integer
+    - tax_rate:
+        not_null: true
+        type: double precision
+    - payment_period:
+        not_null: true
+        type: integer
+    - create_ts:
+        default: now()
+        not_null: true
+        type: timestamp with time zone
+    - update_ts:
+        type: timestamp with time zone
+    - end_ts:
+        default: '''infinity''::timestamp with time zone'
+        not_null: true
+        type: timestamp with time zone
+    foreign_keys:
+      fk_19:
+        columns:
+        - tax_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: tax
+    owner: postgres
+    primary_key:
+      land_tax_pkey:
+        columns:
+        - id
+  table macro_scenario:
+    columns:
+    - id:
+        not_null: true
+        type: bigint
+    - name:
+        not_null: true
+        type: character varying(400)
+    - create_ts:
+        default: now()
+        not_null: true
+        type: timestamp with time zone
+    - update_ts:
+        type: timestamp with time zone
+    - end_ts:
+        default: '''infinity''::timestamp with time zone'
+        not_null: true
+        type: timestamp with time zone
+    - create_user_id:
+        type: bigint
+    - update_user_id:
+        type: bigint
+    foreign_keys:
+      fk_macro_create_user:
+        columns:
+        - create_user_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: account
+      fk_macro_update_user:
+        columns:
+        - update_user_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: account
+    owner: postgres
+    primary_key:
+      macro_scenario_pkey:
+        columns:
+        - id
+  table migration_log:
+    check_constraints:
+      migration_log_dbver_after_check:
+        columns:
+        - dbver_after
+        expression: (dbver_after > 0)
+      migration_log_dbver_before_check:
+        columns:
+        - dbver_before
+        expression: (dbver_before > 0)
+    columns:
+    - id:
+        not_null: true
+        type: bigint
+    - connection_string:
+        not_null: true
+        type: character varying(400)
+    - dbver_before:
+        default: '1'
+        type: integer
+    - dbver_after:
+        default: '1'
+        type: integer
+    - migration_script_id:
+        not_null: true
+        type: bigint
+    - script:
+        not_null: true
+        type: bytea
+    - execution_log:
+        not_null: true
+        type: bytea
+    - success_ind:
+        default: 'false'
+        not_null: true
+        type: boolean
+    - create_ts:
+        default: now()
+        not_null: true
+        type: timestamp with time zone
+    - update_ts:
+        type: timestamp with time zone
+    - end_ts:
+        default: '''infinity''::timestamp with time zone'
+        not_null: true
+        type: timestamp with time zone
+    foreign_keys:
+      fk_migration_script_to_log:
+        columns:
+        - migration_script_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: migration_script
+    owner: postgres
+    primary_key:
+      migration_log_pkey:
+        columns:
+        - id
+  table migration_script:
+    check_constraints:
+      migration_script_dbver_after_check:
+        columns:
+        - dbver_after
+        expression: (dbver_after > 0)
+      migration_script_dbver_before_check:
+        columns:
+        - dbver_before
+        expression: (dbver_before > 0)
+    columns:
+    - id:
+        not_null: true
+        type: bigint
+    - dbver_before:
+        default: '1'
+        type: integer
+    - script_name:
+        not_null: true
+        type: character varying(400)
+    - dbver_after:
+        default: '1'
+        type: integer
+    - create_ts:
+        default: now()
+        not_null: true
+        type: timestamp with time zone
+    - update_ts:
+        type: timestamp with time zone
+    - end_ts:
+        default: '''infinity''::timestamp with time zone'
+        not_null: true
+        type: timestamp with time zone
+    owner: postgres
+    primary_key:
+      migration_script_pkey:
+        columns:
+        - id
+  table property_tax:
+    check_constraints:
+      property_tax_year_check:
+        columns:
+        - year
+        expression: (year > 1900)
+    columns:
+    - id:
+        not_null: true
+        type: bigint
+    - tax_id:
+        not_null: true
+        type: bigint
+    - year:
+        not_null: true
+        type: integer
+    - evol_investment_tax_rate:
+        not_null: true
+        type: double precision
+    - renov_investment_tax_rate:
+        not_null: true
+        type: double precision
+    - evol_reduction_rate:
+        not_null: true
+        type: double precision
+    - renov_growth_rate:
+        not_null: true
+        type: double precision
+    - accounting_rate:
+        not_null: true
+        type: double precision
+    - create_ts:
+        default: now()
+        not_null: true
+        type: timestamp with time zone
+    - update_ts:
+        type: timestamp with time zone
+    - end_ts:
+        default: '''infinity''::timestamp with time zone'
+        not_null: true
+        type: timestamp with time zone
+    - payment_period:
+        default: '0'
+        not_null: true
+        type: integer
+    foreign_keys:
+      fk_18:
+        columns:
+        - tax_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: tax
+    owner: postgres
+    primary_key:
+      property_tax_pkey:
+        columns:
+        - id
+  table scenario:
+    check_constraints:
+      scenario_year_from_check:
+        columns:
+        - year_from
+        expression: (year_from > 1900)
+      scenario_year_to_check:
+        columns:
+        - year_to
+        expression: (year_to > 1900)
+    columns:
+    - id:
+        not_null: true
+        type: bigint
+    - parent_id:
+        type: bigint
+    - name:
+        not_null: true
+        type: character varying(400)
+    - description:
+        type: character varying(4000)
+    - year_from:
+        type: integer
+    - year_to:
+        type: integer
+    - create_ts:
+        default: now()
+        not_null: true
+        type: timestamp with time zone
+    - update_ts:
+        type: timestamp with time zone
+    - end_ts:
+        default: '''infinity''::timestamp with time zone'
+        not_null: true
+        type: timestamp with time zone
+    - create_user_id:
+        type: bigint
+    - update_user_id:
+        type: bigint
+    - calculation_tp_id:
+        default: '1155'
+        not_null: true
+        type: bigint
+    - calculation_status_id:
+        default: '1158'
+        not_null: true
+        type: bigint
+    - cargo_scenario_id:
+        type: bigint
+    - investment_project_id:
+        type: bigint
+    - macro_scenario_id:
+        type: bigint
+    - inflation_user_ind:
+        default: 'true'
+        not_null: true
+        type: boolean
+    - tax_id:
+        type: bigint
+    - indicators_fin_lst:
+        type: bigint[]
+    - indicators_nat_lst:
+        type: bigint[]
+    - bottleneck_liquidation_ind:
+        default: 'false'
+        not_null: true
+        type: boolean
+    foreign_keys:
+      fk_2:
+        columns:
+        - create_user_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: account
+      fk_28:
+        columns:
+        - macro_scenario_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: macro_scenario
+      fk_29:
+        columns:
+        - tax_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: tax
+      fk_3:
+        columns:
+        - update_user_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: account
+      fk_scenario_calculation_status_tp:
+        columns:
+        - calculation_status_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: classification
+      fk_scenario_calculation_tp:
+        columns:
+        - calculation_tp_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: classification
+      fk_scenario_ip:
+        columns:
+        - investment_project_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: investment_project
+      fk_scenarion_child_to_parent:
+        columns:
+        - parent_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: scenario
+    owner: postgres
+    primary_key:
+      scenario_pkey:
+        columns:
+        - id
+  table scenario_acl:
+    columns:
+    - id:
+        not_null: true
+        type: bigint
+    - account_id:
+        not_null: true
+        type: bigint
+    - access_tp_id:
+        not_null: true
+        type: bigint
+    - script:
+        not_null: true
+        type: bigint
+    - create_ts:
+        default: now()
+        not_null: true
+        type: timestamp with time zone
+    - update_ts:
+        type: timestamp with time zone
+    - end_ts:
+        default: '''infinity''::timestamp with time zone'
+        not_null: true
+        type: timestamp with time zone
+    - create_user_id:
+        type: bigint
+    - update_user_id:
+        type: bigint
+    foreign_keys:
+      fk_8:
+        columns:
+        - script
+        references:
+          columns:
+          - id
+          schema: eim
+          table: scenario
+      fk_access_level:
+        columns:
+        - access_tp_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: classification
+      fk_scenario_access_created_user:
+        columns:
+        - create_user_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: account
+      fk_scenario_access_updated_user:
+        columns:
+        - update_user_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: account
+      fk_scenario_access_user:
+        columns:
+        - account_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: account
+    owner: postgres
+    primary_key:
+      scenario_acl_pkey:
+        columns:
+        - id
+  table scenario_aggr_road:
+    columns:
+    - id:
+        not_null: true
+        type: bigint
+    - scenario_id:
+        not_null: true
+        type: bigint
+    - railroad_id:
+        not_null: true
+        type: bigint
+    - create_ts:
+        default: now()
+        not_null: true
+        type: timestamp with time zone
+    - update_ts:
+        type: timestamp with time zone
+    - end_ts:
+        default: '''infinity''::timestamp with time zone'
+        not_null: true
+        type: timestamp with time zone
+    foreign_keys:
+      fk_scenario_consolicated_road:
+        columns:
+        - railroad_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: classification
+      fk_scenario_road:
+        columns:
+        - scenario_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: scenario
+    owner: postgres
+    primary_key:
+      scenario_aggr_road_pkey:
+        columns:
+        - id
+  table scenario_aggr_road_span:
+    check_constraints:
+      scenario_aggr_road_span_year_check:
+        columns:
+        - year
+        expression: (year > 1900)
+    columns:
+    - id:
+        not_null: true
+        type: bigint
+    - scenario_aggr_road_id:
+        not_null: true
+        type: bigint
+    - varid:
+        not_null: true
+        type: bigint
+    - roadid:
+        not_null: true
+        type: bigint
+    - fragid:
+        not_null: true
+        type: bigint
+    - spanid:
+        not_null: true
+        type: bigint
+    - fragnum:
+        not_null: true
+        type: bigint
+    - spannum:
+        not_null: true
+        type: bigint
+    - passportnum:
+        not_null: true
+        type: character varying(400)
+    - beginstation:
+        not_null: true
+        type: bigint
+    - endstation:
+        not_null: true
+        type: bigint
+    - beginstationname:
+        not_null: true
+        type: character varying(400)
+    - endstationname:
+        not_null: true
+        type: character varying(400)
+    - year:
+        not_null: true
+        type: integer
+    - glp:
+        not_null: true
+        type: bigint
+    - controltype:
+        not_null: true
+        type: character varying(400)
+    - tractiontype:
+        not_null: true
+        type: character varying(400)
+    - length:
+        not_null: true
+        type: bigint
+    - massloadfwd:
+        not_null: true
+        type: bigint
+    - massloadbwd:
+        not_null: true
+        type: bigint
+    - capacitynoparallelcargofwd:
+        not_null: true
+        type: bigint
+    - capacitynoparallelcargobwd:
+        not_null: true
+        type: bigint
+    - capacitynoparallelpassfwd:
+        not_null: true
+        type: bigint
+    - capacitynoparallelpassbwd:
+        not_null: true
+        type: bigint
+    - requiredcapacityfwd:
+        not_null: true
+        type: bigint
+    - requiredcapacitybwd:
+        not_null: true
+        type: bigint
+    - cargoloadfwd:
+        not_null: true
+        type: bigint
+    - cargoloadbwd:
+        not_null: true
+        type: bigint
+    - trainsfwd:
+        not_null: true
+        type: bigint
+    - trainsbwd:
+        not_null: true
+        type: bigint
+    - suburbanfwd:
+        not_null: true
+        type: bigint
+    - suburbanbwd:
+        not_null: true
+        type: bigint
+    - suburbanspeedfwd:
+        not_null: true
+        type: bigint
+    - suburbanspeedbwd:
+        not_null: true
+        type: bigint
+    - passengerfwd:
+        not_null: true
+        type: bigint
+    - passengerbwd:
+        not_null: true
+        type: bigint
+    - passengerspeedfwd:
+        not_null: true
+        type: bigint
+    - passengerspeedbwd:
+        not_null: true
+        type: bigint
+    - reservefwd:
+        not_null: true
+        type: bigint
+    - reservebwd:
+        not_null: true
+        type: bigint
+    - detours:
+        type: character varying(4000)
+    - actions:
+        type: character varying(4000)
+    - create_ts:
+        default: now()
+        not_null: true
+        type: timestamp with time zone
+    - update_ts:
+        type: timestamp with time zone
+    - end_ts:
+        default: '''infinity''::timestamp with time zone'
+        not_null: true
+        type: timestamp with time zone
+    foreign_keys:
+      fk_scenario_consolicated_road_frag:
+        columns:
+        - scenario_aggr_road_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: scenario_aggr_road
+    owner: postgres
+    primary_key:
+      scenario_aggr_road_span_pkey:
+        columns:
+        - id
+  table scenario_arrangement_include:
+    columns:
+    - id:
+        not_null: true
+        type: bigint
+    - scenario_id:
+        not_null: true
+        type: bigint
+    - arrangement_id:
+        type: bigint
+    - include_ind:
+        default: 'true'
+        not_null: true
+        type: boolean
+    - create_ts:
+        default: now()
+        not_null: true
+        type: timestamp with time zone
+    - update_ts:
+        type: timestamp with time zone
+    - end_ts:
+        default: '''infinity''::timestamp with time zone'
+        not_null: true
+        type: timestamp with time zone
+    - scenario_event_id:
+        type: bigint
+    foreign_keys:
+      fk_scenario_events_inclusion:
+        columns:
+        - scenario_event_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: scenario_event
+      fk_scenario_inclusion_scenario:
+        columns:
+        - scenario_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: scenario
+    owner: postgres
+    primary_key:
+      scenario_arrangement_include_pkey:
+        columns:
+        - id
+  table scenario_bottleneck:
+    columns:
+    - id:
+        not_null: true
+        type: bigint
+    - scenario_id:
+        not_null: true
+        type: bigint
+    - road:
+        not_null: true
+        type: bigint
+    - year:
+        not_null: true
+        type: integer
+    - begin_stan:
+        not_null: true
+        type: bigint
+    - end_stan:
+        not_null: true
+        type: bigint
+    - create_ts:
+        default: now()
+        not_null: true
+        type: timestamp with time zone
+    - update_ts:
+        type: timestamp with time zone
+    - end_ts:
+        default: '''infinity''::timestamp with time zone'
+        not_null: true
+        type: timestamp with time zone
+    - slice_tp_id:
+        not_null: true
+        type: bigint
+    foreign_keys:
+      fk_31:
+        columns:
+        - slice_tp_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: classification
+      fk_scenario_to_bottleneck:
+        columns:
+        - scenario_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: scenario
+    owner: postgres
+    primary_key:
+      scenario_bottleneck_pkey:
+        columns:
+        - id
+  table scenario_bottleneck_correspondence:
+    columns:
+    - id:
+        not_null: true
+        type: bigint
+    - scenario_bottleneck_id:
+        not_null: true
+        type: bigint
+    - corr_id:
+        not_null: true
+        type: bigint
+    - start_stan:
+        not_null: true
+        type: bigint
+    - end_stan:
+        not_null: true
+        type: bigint
+    - cargo_type:
+        not_null: true
+        type: bigint
+    - transit_type:
+        not_null: true
+        type: character varying(40)
+    - container:
+        not_null: true
+        type: character varying(40)
+    - summ:
+        not_null: true
+        type: double precision
+    - create_ts:
+        default: now()
+        not_null: true
+        type: timestamp with time zone
+    - update_ts:
+        type: timestamp with time zone
+    - end_ts:
+        default: '''infinity''::timestamp with time zone'
+        not_null: true
+        type: timestamp with time zone
+    foreign_keys:
+      fk_bottleneck_corr:
+        columns:
+        - scenario_bottleneck_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: scenario_bottleneck
+    owner: postgres
+    primary_key:
+      scenario_bottleneck_correspondence_pkey:
+        columns:
+        - id
+  table scenario_calculation:
+    columns:
+    - id:
+        not_null: true
+        type: bigint
+    - scenario_id:
+        not_null: true
+        type: bigint
+    - calculation_tp_id:
+        default: '1155'
+        not_null: true
+        type: bigint
+    - calculation_status_id:
+        default: '1158'
+        not_null: true
+        type: bigint
+    - rank:
+        default: '0'
+        not_null: true
+        type: integer
+    - create_ts:
+        default: now()
+        not_null: true
+        type: timestamp with time zone
+    - update_ts:
+        type: timestamp with time zone
+    - end_ts:
+        default: '''infinity''::timestamp with time zone'
+        not_null: true
+        type: timestamp with time zone
+    - create_user_id:
+        type: bigint
+    - update_user_id:
+        type: bigint
+    - calc_phase_done_lst:
+        type: bigint[]
+    - calc_phase_current_id:
+        default: '0'
+        type: bigint
+    foreign_keys:
+      fk_cacl_phase:
+        columns:
+        - calc_phase_current_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: classification
+      fk_calculation_create_user:
+        columns:
+        - create_user_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: account
+      fk_calculation_scenario_eim:
+        columns:
+        - scenario_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: scenario
+      fk_calculation_status_tp:
+        columns:
+        - calculation_status_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: classification
+      fk_calculation_tp:
+        columns:
+        - calculation_tp_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: classification
+      fk_calculation_update_user:
+        columns:
+        - update_user_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: account
+    owner: postgres
+    primary_key:
+      scenario_calculation_pkey:
+        columns:
+        - id
+  table scenario_eq_cost:
+    columns:
+    - id:
+        not_null: true
+        type: bigint
+    - scenario_id:
+        not_null: true
+        type: bigint
+    - railroad_id:
+        not_null: true
+        type: bigint
+    - year:
+        default: '2023'
+        not_null: true
+        type: integer
+    - factor:
+        default: '0'
+        not_null: true
+        type: double precision
+    - create_ts:
+        default: now()
+        not_null: true
+        type: timestamp with time zone
+    - update_ts:
+        type: timestamp with time zone
+    - end_ts:
+        default: '''infinity''::timestamp with time zone'
+        not_null: true
+        type: timestamp with time zone
+    foreign_keys:
+      fk_scenario_eq_cost:
+        columns:
+        - scenario_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: scenario
+      fk_scenario_eq_cost_road_tp:
+        columns:
+        - railroad_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: classification
+    owner: postgres
+    primary_key:
+      scenario_eq_cost_pkey:
+        columns:
+        - id
+  table scenario_eq_tariff:
+    columns:
+    - id:
+        not_null: true
+        type: bigint
+    - scenario_id:
+        not_null: true
+        type: bigint
+    - cargo_hl_tp_id:
+        not_null: true
+        type: bigint
+    - factor:
+        default: '0'
+        not_null: true
+        type: double precision
+    - create_ts:
+        default: now()
+        not_null: true
+        type: timestamp with time zone
+    - update_ts:
+        type: timestamp with time zone
+    - end_ts:
+        default: '''infinity''::timestamp with time zone'
+        not_null: true
+        type: timestamp with time zone
+    foreign_keys:
+      fk_scenario_eq_tariff:
+        columns:
+        - scenario_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: scenario
+      fk_scenario_eq_tariff_cargo_tp:
+        columns:
+        - cargo_hl_tp_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: classification
+    owner: postgres
+    primary_key:
+      scenario_eq_tariff_pkey:
+        columns:
+        - id
+  table scenario_event:
+    columns:
+    - id:
+        not_null: true
+        type: bigint
+    - scenario_id:
+        not_null: true
+        type: bigint
+    - var_id:
+        not_null: true
+        type: bigint
+    - load_dt:
+        not_null: true
+        type: date
+    - evolution_tp_nm:
+        not_null: true
+        type: character varying(400)
+    - event_start:
+        not_null: true
+        type: date
+    - effective_dt:
+        not_null: true
+        type: date
+    - spiui_id:
+        not_null: true
+        type: character varying(400)
+    - invest_sum:
+        not_null: true
+        type: double precision
+    - create_ts:
+        default: now()
+        not_null: true
+        type: timestamp with time zone
+    - update_ts:
+        type: timestamp with time zone
+    - end_ts:
+        default: '''infinity''::timestamp with time zone'
+        not_null: true
+        type: timestamp with time zone
+    foreign_keys:
+      fk_scenario_to_events:
+        columns:
+        - scenario_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: scenario
+    owner: postgres
+    primary_key:
+      scenario_event_pkey:
+        columns:
+        - id
+  table scenario_event_info:
+    columns:
+    - id:
+        not_null: true
+        type: bigint
+    - scenario_event_id:
+        not_null: true
+        type: bigint
+    - len:
+        not_null: true
+        type: double precision
+    - code_to:
+        not_null: true
+        type: bigint
+    - code_from:
+        not_null: true
+        type: bigint
+    - patch_count_after:
+        type: bigint
+    - patch_count_before:
+        type: bigint
+    - locomotive_tp_after:
+        type: character varying(40)
+    - locomotive_tp_before:
+        type: character varying(40)
+    - communication_tool_after:
+        type: character varying(40)
+    - communication_tool_before:
+        type: character varying(40)
+    - create_ts:
+        default: now()
+        not_null: true
+        type: timestamp with time zone
+    - update_ts:
+        type: timestamp with time zone
+    - end_ts:
+        default: '''infinity''::timestamp with time zone'
+        not_null: true
+        type: timestamp with time zone
+    foreign_keys:
+      fk_ev_info:
+        columns:
+        - scenario_event_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: scenario_event
+    owner: postgres
+    primary_key:
+      scenario_event_info_pkey:
+        columns:
+        - id
+  table scenario_event_schedule:
+    columns:
+    - id:
+        not_null: true
+        type: bigint
+    - scenario_event_info_id:
+        not_null: true
+        type: bigint
+    - year:
+        not_null: true
+        type: integer
+    - load:
+        not_null: true
+        type: double precision
+    - create_ts:
+        default: now()
+        not_null: true
+        type: timestamp with time zone
+    - update_ts:
+        type: timestamp with time zone
+    - end_ts:
+        default: '''infinity''::timestamp with time zone'
+        not_null: true
+        type: timestamp with time zone
+    foreign_keys:
+      fk_ev_info_schdl:
+        columns:
+        - scenario_event_info_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: scenario_event_info
+    owner: postgres
+    primary_key:
+      scenario_event_schedule_pkey:
+        columns:
+        - id
+  table scenario_opcost:
+    columns:
+    - id:
+        not_null: true
+        type: bigint
+    - scenario_id:
+        not_null: true
+        type: bigint
+    - var_id:
+        not_null: true
+        type: bigint
+    - corr_id:
+        not_null: true
+        type: bigint
+    - station_from_cd:
+        not_null: true
+        type: bigint
+    - station_to_cd:
+        not_null: true
+        type: bigint
+    - cargo_tp_cd:
+        not_null: true
+        type: bigint
+    - gr_code_usl:
+        not_null: true
+        type: bigint
+    - rod_gr_name:
+        not_null: true
+        type: character varying(40)
+    - delivery_tp:
+        not_null: true
+        type: character varying(40)
+    - ves:
+        not_null: true
+        type: double precision
+    - cost_loaded_amt:
+        not_null: true
+        type: double precision
+    - cost_empty_amt:
+        not_null: true
+        type: double precision
+    - create_ts:
+        default: now()
+        not_null: true
+        type: timestamp with time zone
+    - update_ts:
+        type: timestamp with time zone
+    - end_ts:
+        default: '''infinity''::timestamp with time zone'
+        not_null: true
+        type: timestamp with time zone
+    foreign_keys:
+      fk_scenario_opcost:
+        columns:
+        - scenario_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: scenario
+    owner: postgres
+    primary_key:
+      scenario_opcost_pkey:
+        columns:
+        - id
+  table scenario_opcost_schedule:
+    columns:
+    - id:
+        not_null: true
+        type: bigint
+    - scenario_opcost_id:
+        not_null: true
+        type: bigint
+    - year:
+        not_null: true
+        type: integer
+    - car_count:
+        not_null: true
+        type: double precision
+    - create_ts:
+        default: now()
+        not_null: true
+        type: timestamp with time zone
+    - update_ts:
+        type: timestamp with time zone
+    - end_ts:
+        default: '''infinity''::timestamp with time zone'
+        not_null: true
+        type: timestamp with time zone
+    foreign_keys:
+      fk_scenario_opcost_schedule:
+        columns:
+        - scenario_opcost_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: scenario_opcost
+    owner: postgres
+    primary_key:
+      scenario_opcost_schedule_pkey:
+        columns:
+        - id
+  table scenario_res:
+    columns:
+    - id:
+        not_null: true
+        type: bigint
+    - scenario_id:
+        not_null: true
+        type: bigint
+    - slice_tp_id:
+        not_null: true
+        type: bigint
+    - income_amt:
+        not_null: true
+        type: double precision
+    - cost_amt:
+        not_null: true
+        type: double precision
+    - evol_capex_amt:
+        not_null: true
+        type: double precision
+    - renov_capex_amt:
+        not_null: true
+        type: double precision
+    - npv_own_amt:
+        not_null: true
+        type: double precision
+    - npv_fed_amt:
+        not_null: true
+        type: double precision
+    - npv_region_amt:
+        not_null: true
+        type: double precision
+    - spp:
+        not_null: true
+        type: integer
+    - dpp:
+        not_null: true
+        type: integer
+    - irr:
+        not_null: true
+        type: double precision
+    - bottleneck_cnt:
+        not_null: true
+        type: integer
+    - delivery_gap_amt:
+        not_null: true
+        type: double precision
+    - delivery_gap:
+        not_null: true
+        type: double precision
+    - create_ts:
+        default: now()
+        not_null: true
+        type: timestamp with time zone
+    - update_ts:
+        type: timestamp with time zone
+    - end_ts:
+        default: '''infinity''::timestamp with time zone'
+        not_null: true
+        type: timestamp with time zone
+    foreign_keys:
+      fk_calc_result_tp:
+        columns:
+        - slice_tp_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: classification
+      fk_scenario_to_results:
+        columns:
+        - scenario_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: scenario
+    owner: postgres
+    primary_key:
+      scenario_res_pkey:
+        columns:
+        - id
+  table scenario_res_pivot:
+    columns:
+    - id:
+        not_null: true
+        type: bigint
+    - year:
+        default: '2023'
+        not_null: true
+        type: integer
+    - create_ts:
+        default: now()
+        not_null: true
+        type: timestamp with time zone
+    - update_ts:
+        type: timestamp with time zone
+    - end_ts:
+        default: '''infinity''::timestamp with time zone'
+        not_null: true
+        type: timestamp with time zone
+    - scenario_res_id:
+        not_null: true
+        type: bigint
+    - operational_cost_amt:
+        not_null: true
+        type: double precision
+    - pure_income_amt:
+        not_null: true
+        type: double precision
+    - ebit_amt:
+        not_null: true
+        type: double precision
+    - ebitda_amt:
+        not_null: true
+        type: double precision
+    - tax_amt:
+        not_null: true
+        type: double precision
+    - tax_vat_amt:
+        not_null: true
+        type: double precision
+    - tax_income_amt:
+        not_null: true
+        type: double precision
+    - tax_land_amt:
+        not_null: true
+        type: double precision
+    - tax_property_amt:
+        not_null: true
+        type: double precision
+    - fcf_amt:
+        not_null: true
+        type: double precision
+    - fcff_amt:
+        not_null: true
+        type: double precision
+    - evol_capex_amt:
+        not_null: true
+        type: double precision
+    - renov_capex_amt:
+        not_null: true
+        type: double precision
+    - fcf_own_amt:
+        not_null: true
+        type: double precision
+    - fcfe_amt:
+        not_null: true
+        type: double precision
+    foreign_keys:
+      fk_res_to_fin:
+        columns:
+        - scenario_res_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: scenario_res
+    owner: postgres
+    primary_key:
+      scenario_res_pivot_pkey:
+        columns:
+        - id
+  table scenario_res_pivot_invest:
+    columns:
+    - id:
+        not_null: true
+        type: bigint
+    - scenario_res_pivot_id:
+        not_null: true
+        type: bigint
+    - investment_amt:
+        not_null: true
+        type: double precision
+    - create_ts:
+        default: now()
+        not_null: true
+        type: timestamp with time zone
+    - update_ts:
+        type: timestamp with time zone
+    - end_ts:
+        default: '''infinity''::timestamp with time zone'
+        not_null: true
+        type: timestamp with time zone
+    - funding_tp_id:
+        not_null: true
+        type: bigint
+    foreign_keys:
+      fk_33:
+        columns:
+        - funding_tp_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: classification
+      fk_investment_detial:
+        columns:
+        - scenario_res_pivot_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: scenario_res_pivot
+    owner: postgres
+    primary_key:
+      scenario_res_pivot_invest_pkey:
+        columns:
+        - id
+  table scenario_res_pnl:
+    columns:
+    - id:
+        not_null: true
+        type: bigint
+    - cargo_hl_tp_id:
+        not_null: true
+        type: bigint
+    - year:
+        default: '2023'
+        not_null: true
+        type: integer
+    - income_amt:
+        not_null: true
+        type: double precision
+    - income_growth_amt:
+        not_null: true
+        type: double precision
+    - cost_amt:
+        not_null: true
+        type: double precision
+    - cost_growth_amt:
+        not_null: true
+        type: double precision
+    - create_ts:
+        default: now()
+        not_null: true
+        type: timestamp with time zone
+    - update_ts:
+        type: timestamp with time zone
+    - end_ts:
+        default: '''infinity''::timestamp with time zone'
+        not_null: true
+        type: timestamp with time zone
+    - scenario_res_id:
+        not_null: true
+        type: bigint
+    - delivery:
+        not_null: true
+        type: double precision
+    - delivery_gap:
+        not_null: true
+        type: double precision
+    - delivery_rate:
+        not_null: true
+        type: double precision
+    - delivery_gap_rub:
+        not_null: true
+        type: double precision
+    foreign_keys:
+      fk_res_to_pnl:
+        columns:
+        - scenario_res_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: scenario_res
+      fk_scenario_pnl_cargo_tp:
+        columns:
+        - cargo_hl_tp_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: classification
+    owner: postgres
+    primary_key:
+      scenario_res_pnl_pkey:
+        columns:
+        - id
+  table scenario_tariff:
+    columns:
+    - id:
+        not_null: true
+        type: bigint
+    - scenario_id:
+        not_null: true
+        type: bigint
+    - var_id:
+        not_null: true
+        type: bigint
+    - corr_id:
+        not_null: true
+        type: bigint
+    - calculation_dt:
+        not_null: true
+        type: date
+    - st_ot_id:
+        not_null: true
+        type: bigint
+    - st_nz_id:
+        not_null: true
+        type: bigint
+    - station_from:
+        not_null: true
+        type: bigint
+    - station_to:
+        not_null: true
+        type: bigint
+    - cargo_tp:
+        not_null: true
+        type: bigint
+    - cargo_tp1_cd:
+        not_null: true
+        type: bigint
+    - shipment_tp:
+        not_null: true
+        type: character varying(40)
+    - year:
+        not_null: true
+        type: integer
+    - route_tp:
+        not_null: true
+        type: character varying(40)
+    - car_num_per_day:
+        not_null: true
+        type: double precision
+    - volume_corr:
+        not_null: true
+        type: double precision
+    - st_ot_nx:
+        not_null: true
+        type: character varying(40)
+    - st_nz_nx:
+        not_null: true
+        type: character varying(40)
+    - commute_tp:
+        not_null: true
+        type: character varying(40)
+    - statng:
+        not_null: true
+        type: double precision
+    - car_tp:
+        not_null: true
+        type: bigint
+    - container:
+        not_null: true
+        type: character varying(40)
+    - car_cnt_per_goup:
+        not_null: true
+        type: bigint
+    - main_pay_loaded:
+        not_null: true
+        type: double precision
+    - main_pay_empty:
+        not_null: true
+        type: double precision
+    - add_pay_loaded:
+        not_null: true
+        type: double precision
+    - add_pay_empty:
+        not_null: true
+        type: double precision
+    - min_way:
+        not_null: true
+        type: double precision
+    - create_ts:
+        default: now()
+        not_null: true
+        type: timestamp with time zone
+    - update_ts:
+        type: timestamp with time zone
+    - end_ts:
+        default: '''infinity''::timestamp with time zone'
+        not_null: true
+        type: timestamp with time zone
+    foreign_keys:
+      fk_scenario_tarif:
+        columns:
+        - scenario_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: scenario
+    owner: postgres
+    primary_key:
+      scenario_tariff_pkey:
+        columns:
+        - id
+  table setting:
+    columns:
+    - id:
+        not_null: true
+        type: bigint
+    - parameter_id:
+        not_null: true
+        type: bigint
+    - float_val:
+        type: double precision
+    - str_val:
+        not_null: true
+        type: character varying(400)
+    - create_ts:
+        default: now()
+        not_null: true
+        type: timestamp with time zone
+    - update_ts:
+        type: timestamp with time zone
+    - end_ts:
+        default: '''infinity''::timestamp with time zone'
+        not_null: true
+        type: timestamp with time zone
+    - create_user_id:
+        type: bigint
+    - update_user_id:
+        type: bigint
+    - int_val:
+        type: integer
+    foreign_keys:
+      fk_setting_parameter:
+        columns:
+        - parameter_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: classification
+      fk_settings_cru:
+        columns:
+        - create_user_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: account
+      fk_settings_uu:
+        columns:
+        - update_user_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: account
+    owner: postgres
+    primary_key:
+      setting_pkey:
+        columns:
+        - id
+  table station:
+    check_constraints:
+      station_lat_check:
+        columns:
+        - lat
+        expression: (lat >= (0)::double precision)
+      station_lon_check:
+        columns:
+        - lon
+        expression: (lon >= (0)::double precision)
+    columns:
+    - id:
+        not_null: true
+        type: bigint
+    - name:
+        not_null: true
+        type: character varying(400)
+    - code:
+        not_null: true
+        type: integer
+    - lat:
+        default: '0'
+        type: double precision
+    - lon:
+        default: '0'
+        type: double precision
+    - create_ts:
+        default: now()
+        not_null: true
+        type: timestamp with time zone
+    - update_ts:
+        type: timestamp with time zone
+    - end_ts:
+        default: '''infinity''::timestamp with time zone'
+        not_null: true
+        type: timestamp with time zone
+    - code_cnsi:
+        default: '0'
+        not_null: true
+        type: integer
+    - x:
+        default: '0'
+        type: double precision
+    - y:
+        default: '0'
+        type: double precision
+    - hl_net_ind:
+        default: 'false'
+        not_null: true
+        type: boolean
+    - railroad_id:
+        type: bigint
+    - region_id:
+        type: bigint
+    foreign_keys:
+      fk_25:
+        columns:
+        - railroad_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: classification
+      fk_41:
+        columns:
+        - region_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: classification
+    owner: postgres
+    primary_key:
+      station_pkey:
+        columns:
+        - id
+  table tax:
+    columns:
+    - id:
+        not_null: true
+        type: bigint
+    - name:
+        not_null: true
+        type: character varying(400)
+    - create_ts:
+        default: now()
+        not_null: true
+        type: timestamp with time zone
+    - update_ts:
+        type: timestamp with time zone
+    - end_ts:
+        default: '''infinity''::timestamp with time zone'
+        not_null: true
+        type: timestamp with time zone
+    - create_user_id:
+        type: bigint
+    - update_user_id:
+        type: bigint
+    foreign_keys:
+      fk_tax_mode_create_user:
+        columns:
+        - create_user_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: account
+      fk_tax_mode_update_user:
+        columns:
+        - update_user_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: account
+    owner: postgres
+    primary_key:
+      tax_pkey:
+        columns:
+        - id
+  table te_version:
+    columns:
+    - id:
+        not_null: true
+        type: bigint
+    - create_ts:
+        default: now()
+        not_null: true
+        type: timestamp with time zone
+    - update_ts:
+        type: timestamp with time zone
+    - end_ts:
+        default: '''infinity''::timestamp with time zone'
+        not_null: true
+        type: timestamp with time zone
+    - create_user_id:
+        type: bigint
+    - update_user_id:
+        type: bigint
+    - form_id:
+        not_null: true
+        type: bigint
+    foreign_keys:
+      fk_te_version_create_user_id:
+        columns:
+        - create_user_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: account
+      fk_te_version_form_id:
+        columns:
+        - form_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: classification
+      fk_te_version_update_user_id:
+        columns:
+        - update_user_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: account
+    owner: postgres
+    primary_key:
+      te_version_pkey:
+        columns:
+        - id
+  table user_audit:
+    columns:
+    - id:
+        not_null: true
+        type: bigint
+    - account_id:
+        not_null: true
+        type: bigint
+    - user_nm:
+        not_null: true
+        type: character varying(400)
+    - user_dept_nm:
+        not_null: true
+        type: character varying(400)
+    - user_login:
+        not_null: true
+        type: character varying(400)
+    - user_session_id:
+        not_null: true
+        type: bigint
+    - ip_address:
+        not_null: true
+        type: character varying(40)
+    - file_nm:
+        not_null: true
+        type: character varying(40)
+    - data_dsc:
+        not_null: true
+        type: character varying(400)
+    - file_sz:
+        type: double precision
+    - create_ts:
+        default: now()
+        not_null: true
+        type: timestamp with time zone
+    - update_ts:
+        type: timestamp with time zone
+    - end_ts:
+        default: '''infinity''::timestamp with time zone'
+        not_null: true
+        type: timestamp with time zone
+    foreign_keys:
+      fk_user_audit_account:
+        columns:
+        - account_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: account
+      fk_user_audit_session:
+        columns:
+        - user_session_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: user_session
+    owner: postgres
+    primary_key:
+      user_audit_pkey:
+        columns:
+        - id
+  table user_event:
+    columns:
+    - id:
+        not_null: true
+        type: bigint
+    - account_id:
+        not_null: true
+        type: bigint
+    - user_event_tp_id:
+        not_null: true
+        type: bigint
+    - description:
+        not_null: true
+        type: character varying(400)
+    - url:
+        type: character varying(2048)
+    - read_ind:
+        default: 'false'
+        not_null: true
+        type: boolean
+    - create_ts:
+        default: now()
+        not_null: true
+        type: timestamp with time zone
+    - update_ts:
+        type: timestamp with time zone
+    - end_ts:
+        default: '''infinity''::timestamp with time zone'
+        not_null: true
+        type: timestamp with time zone
+    foreign_keys:
+      fk_user_event_account:
+        columns:
+        - account_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: account
+      fk_user_event_tp:
+        columns:
+        - user_event_tp_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: classification
+    owner: postgres
+    primary_key:
+      user_event_pkey:
+        columns:
+        - id
+  table user_session:
+    columns:
+    - id:
+        not_null: true
+        type: bigint
+    - account_id:
+        type: bigint
+    - login_success_ind:
+        not_null: true
+        type: boolean
+    - login_ts:
+        default: now()
+        type: timestamp with time zone
+    - ip_address:
+        type: character varying(40)
+    - supplied_user_name:
+        not_null: true
+        type: character varying(40)
+    - jwt_token:
+        type: character varying(400)
+    - user_agent:
+        type: character varying(400)
+    - connection_tp_id:
+        type: bigint
+    - session_end_ts:
+        type: date
+    - duration:
+        type: real
+    - create_ts:
+        default: now()
+        not_null: true
+        type: timestamp with time zone
+    - update_ts:
+        type: timestamp with time zone
+    - end_ts:
+        default: '''infinity''::timestamp with time zone'
+        not_null: true
+        type: timestamp with time zone
+    foreign_keys:
+      fk_connection_tp:
+        columns:
+        - connection_tp_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: classification
+      fk_session_user:
+        columns:
+        - account_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: account
+    owner: postgres
+    primary_key:
+      user_session_pkey:
+        columns:
+        - id
+  table vat:
+    check_constraints:
+      vat_year_check:
+        columns:
+        - year
+        expression: (year > 1900)
+    columns:
+    - id:
+        not_null: true
+        type: bigint
+    - tax_id:
+        not_null: true
+        type: bigint
+    - year:
+        not_null: true
+        type: integer
+    - income_growth_tax_rate:
+        not_null: true
+        type: double precision
+    - investment_tax_rate:
+        not_null: true
+        type: double precision
+    - opr_cost_growth_tax_rate:
+        not_null: true
+        type: double precision
+    - maintenance_tax_rate:
+        not_null: true
+        type: double precision
+    - payment_period:
+        not_null: true
+        type: integer
+    - create_ts:
+        default: now()
+        not_null: true
+        type: timestamp with time zone
+    - update_ts:
+        type: timestamp with time zone
+    - end_ts:
+        default: '''infinity''::timestamp with time zone'
+        not_null: true
+        type: timestamp with time zone
+    foreign_keys:
+      fk_17:
+        columns:
+        - tax_id
+        references:
+          columns:
+          - id
+          schema: eim
+          table: tax
+    owner: postgres
+    primary_key:
+      vat_pkey:
+        columns:
+        - id
+schema public:
+  description: standard public schema
+  owner: pg_database_owner
+  privileges:
+  - PUBLIC:
+    - usage
+  - pg_database_owner:
+    - all
+

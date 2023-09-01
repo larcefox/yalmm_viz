@@ -1,0 +1,97 @@
+schema public:
+  sequence main_seq:
+    cache_value: 1
+    increment_by: 1
+    max_value: null
+    min_value: null
+    start_value: 1000000
+
+schema eim:
+  table vat:
+    check_constraints:
+      vat_year_check:
+        columns:
+        - year
+        expression: (year > 1900)
+
+  table property_tax:
+    check_constraints:
+      property_tax_year_check:
+        columns:
+        - year
+        expression: (year > 1900)
+
+  table land_tax:
+    check_constraints:
+      land_tax_year_check:
+        columns:
+        - year
+        expression: (year > 1900)
+
+  table income_tax:
+    check_constraints:
+      income_tax_year_check:
+        columns:
+        - year
+        expression: (year > 1900)
+
+  table station:
+    check_constraints:
+      station_lat_check:
+        columns:
+        - lat
+        expression: (lat >= (0)::double precision)
+      station_lon_check:
+        columns:
+        - lon
+        expression: (lon >= (0)::double precision)
+
+  table scenario_aggr_road_span:
+    check_constraints:
+      scenario_aggr_road_span_year_check:
+        columns:
+        - year
+        expression: (year > 1900)
+
+  table migration_log:
+    check_constraints:
+      migration_log_dbver_after_check:
+        columns:
+        - dbver_after
+        expression: (dbver_after > 0)
+      migration_log_dbver_before_check:
+        columns:
+        - dbver_before
+        expression: (dbver_before > 0)
+
+  table migration_script:
+    check_constraints:
+      migration_script_dbver_after_check:
+        columns:
+        - dbver_after
+        expression: (dbver_after > 0)
+      migration_script_dbver_before_check:
+        columns:
+        - dbver_before
+        expression: (dbver_before > 0)
+
+  table idx_value:
+    check_constraints:
+      idx_value_year_check:
+        columns:
+        - year
+        expression: (year > 1900)
+
+  table investment_project_fund:
+    check_constraints:
+      investment_project_fund_year_check:
+        columns:
+        - year
+        expression: (year > 1900)
+
+  table investment_project:
+    check_constraints:
+      investment_project_version_num_check:
+        columns:
+        - version_num
+        expression: (version_num > 0)

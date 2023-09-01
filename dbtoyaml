@@ -1,0 +1,1 @@
+postgres -H 192.168.31.25 -p 5432 -U postgres -W eim
